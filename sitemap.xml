@@ -3,11 +3,98 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://amirmohammadkz.github.io/publication-type/1/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://amirmohammadkz.github.io/author/amirmohammad-kazemeini/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://amirmohammadkz.github.io/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
   </url>
   
   <url>
     <loc>https://amirmohammadkz.github.io/authors/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://amirmohammadkz.github.io/publication/conference-paper/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://amirmohammadkz.github.io/author/clemens-stachl/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://amirmohammadkz.github.io/tag/computational-psychology/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://amirmohammadkz.github.io/tag/deep-learning/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://amirmohammadkz.github.io/author/erik-cambria/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://amirmohammadkz.github.io/tag/explainable-ai/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://amirmohammadkz.github.io/tag/language-model/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://amirmohammadkz.github.io/tag/natural-language-understanding/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://amirmohammadkz.github.io/tag/personality-detection/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://amirmohammadkz.github.io/publication_types/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://amirmohammadkz.github.io/publication/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://amirmohammadkz.github.io/author/samin-fatehi/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://amirmohammadkz.github.io/author/sauleh-eetemadi/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://amirmohammadkz.github.io/tags/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://amirmohammadkz.github.io/author/yash-mehta/</loc>
+    <lastmod>2020-09-24T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -15,27 +102,11 @@
   </url>
   
   <url>
-    <loc>https://amirmohammadkz.github.io/author/nelson-bighetti/</loc>
-  </url>
-  
-  <url>
     <loc>https://amirmohammadkz.github.io/post/</loc>
   </url>
   
   <url>
-    <loc>https://amirmohammadkz.github.io/publication_types/</loc>
-  </url>
-  
-  <url>
-    <loc>https://amirmohammadkz.github.io/publication/</loc>
-  </url>
-  
-  <url>
     <loc>https://amirmohammadkz.github.io/talk/</loc>
-  </url>
-  
-  <url>
-    <loc>https://amirmohammadkz.github.io/tags/</loc>
   </url>
   
 </urlset>

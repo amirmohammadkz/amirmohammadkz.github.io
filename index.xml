@@ -13,273 +13,643 @@
     </image>
     
     <item>
-      <title>Writing technical content in Academic</title>
+      <title>If I was a machine, part 1: The future may not be as beautiful as we think.</title>
       <link>https://amirmohammadkz.github.io/post/post1/</link>
       <pubDate>Sun, 27 Sep 2020 00:00:00 +0000</pubDate>
       <guid>https://amirmohammadkz.github.io/post/post1/</guid>
-      <description>&lt;p&gt;Academic is designed to give technical content creators a seamless experience. You can focus on the content and Academic handles the rest.&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;Highlight your code snippets, take notes on math classes, and draw diagrams from textual representation.&lt;/strong&gt;&lt;/p&gt;
-&lt;p&gt;On this page, you&amp;rsquo;ll find some examples of the types of technical content that can be rendered with Academic.&lt;/p&gt;
-&lt;h2 id=&#34;examples&#34;&gt;Examples&lt;/h2&gt;
-&lt;h3 id=&#34;code&#34;&gt;Code&lt;/h3&gt;
-&lt;p&gt;Academic supports a Markdown extension for highlighting code syntax. You can enable this feature by toggling the &lt;code&gt;highlight&lt;/code&gt; option in your &lt;code&gt;config/_default/params.toml&lt;/code&gt; file.&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;```python
-import pandas as pd
-data = pd.read_csv(&amp;quot;data.csv&amp;quot;)
-data.head()
-```
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;renders as&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-python&#34;&gt;import pandas as pd
-data = pd.read_csv(&amp;quot;data.csv&amp;quot;)
-data.head()
-&lt;/code&gt;&lt;/pre&gt;
-&lt;h3 id=&#34;charts&#34;&gt;Charts&lt;/h3&gt;
-&lt;p&gt;Academic supports the popular &lt;a href=&#34;https://plot.ly/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Plotly&lt;/a&gt; chart format.&lt;/p&gt;
-&lt;p&gt;Save your Plotly JSON in your page folder, for example &lt;code&gt;chart.json&lt;/code&gt;, and then add the &lt;code&gt;{{&amp;lt; chart data=&amp;quot;chart&amp;quot; &amp;gt;}}&lt;/code&gt; shortcode where you would like the chart to appear.&lt;/p&gt;
-&lt;p&gt;Demo:&lt;/p&gt;
+      <description>&lt;p&gt;Hello, this is the first part of this serie. In this story, I try to question some of the dark sides of AI, which I think are forgotten or neglected.&lt;/p&gt;
+&lt;h3 id=&#34;why-should-you-read-this&#34;&gt;Why should you read this?&lt;/h3&gt;
+&lt;p&gt;This story is not a state-of-the-art paper explanation, nor is it a pure academic article. As a recent graduate research student learning NLP to leverage it in psychology and social science, I will share my thoughts with you. I believe that we are inherently creative, and the structure of learning, and the way we restrict ourselves in the systems, will deteriorate it. Inevitably, I should follow a similar path as other students did, and I think my creative aspect will be diminished because the whole process is a spoiler path. We are bombarded with pure knowledge without finding out what the problem is and how we can invent a solution. Limited in the fixed study routines, trying to read all the requirements of a problem, and then we are expected to design and create after it. But how can we do it? This process, each step of this trail, contains a host of opportunities for creating. However, we are obligated to study all the requirements first because the chance of inventing something that is not made before and performs better is not high. It might be right, but we are improving this chance in the cost of sacrificing creativity, the essential tool for producing novelty. So, I decided not to follow the typical path and make my way a bit slower. I try to do this by guessing the next step each time I learn a new subject, questioning the most prominent drawbacks of current methods before jumping into state-of-the-art discussions from the most famous researchers.
+By following these steps, I may go outside of the box, because I do not know where the box is now, that is the key. When I am aware of the box, outside can be interpreted as a new box, “the box of outside”. Maybe the first chapters are a bit rusty and unstructured, but I try to improve it bit by bit. So, if you agree with me, follow my journey.&lt;/p&gt;
+&lt;h2 id=&#34;nlp-and-ai-are-against-morality&#34;&gt;NLP and AI are against morality&lt;/h2&gt;
 
 
-&lt;div id=&#34;chart-382416759&#34; class=&#34;chart pb-3&#34; style=&#34;max-width: 100%; margin: auto;&#34;&gt;&lt;/div&gt;
-&lt;script&gt;
-  (function() {
-    let a = setInterval( function() {
-      if ( typeof window.Plotly === &#39;undefined&#39; ) {
-        return;
-      }
-      clearInterval( a );
 
-      Plotly.d3.json(&#34;./line-chart.json&#34;, function(chart) {
-        Plotly.plot(&#39;chart-382416759&#39;, chart.data, chart.layout, {responsive: true});
-      });
-    }, 500 );
-  })();
-&lt;/script&gt;
-&lt;p&gt;You might also find the &lt;a href=&#34;http://plotly-json-editor.getforge.io/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Plotly JSON Editor&lt;/a&gt; useful.&lt;/p&gt;
-&lt;h3 id=&#34;math&#34;&gt;Math&lt;/h3&gt;
-&lt;p&gt;Academic supports a Markdown extension for $\LaTeX$ math. You can enable this feature by toggling the &lt;code&gt;math&lt;/code&gt; option in your &lt;code&gt;config/_default/params.toml&lt;/code&gt; file.&lt;/p&gt;
-&lt;p&gt;To render &lt;em&gt;inline&lt;/em&gt; or &lt;em&gt;block&lt;/em&gt; math, wrap your LaTeX math with &lt;code&gt;$...$&lt;/code&gt; or &lt;code&gt;$$...$$&lt;/code&gt;, respectively.&lt;/p&gt;
-&lt;p&gt;Example &lt;strong&gt;math block&lt;/strong&gt;:&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-latex&#34;&gt;$$\gamma_{n} = \frac{ 
-\left | \left (\mathbf x_{n} - \mathbf x_{n-1} \right )^T 
-\left [\nabla F (\mathbf x_{n}) - \nabla F (\mathbf x_{n-1}) \right ] \right |}
-{\left \|\nabla F(\mathbf{x}_{n}) - \nabla F(\mathbf{x}_{n-1}) \right \|^2}$$
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;renders as&lt;/p&gt;
-&lt;p&gt;$$\gamma_{n} = \frac{ \left | \left (\mathbf x_{n} - \mathbf x_{n-1} \right )^T \left [\nabla F (\mathbf x_{n}) - \nabla F (\mathbf x_{n-1}) \right ] \right |}{\left |\nabla F(\mathbf{x}_{n}) - \nabla F(\mathbf{x}_{n-1}) \right |^2}$$&lt;/p&gt;
-&lt;p&gt;Example &lt;strong&gt;inline math&lt;/strong&gt; &lt;code&gt;$\nabla F(\mathbf{x}_{n})$&lt;/code&gt; renders as $\nabla F(\mathbf{x}_{n})$.&lt;/p&gt;
-&lt;p&gt;Example &lt;strong&gt;multi-line math&lt;/strong&gt; using the &lt;code&gt;\\\\&lt;/code&gt; math linebreak:&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-latex&#34;&gt;$$f(k;p_0^*) = \begin{cases} p_0^* &amp;amp; \text{if }k=1, \\\\
-1-p_0^* &amp;amp; \text {if }k=0.\end{cases}$$
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;renders as&lt;/p&gt;
-&lt;p&gt;$$f(k;p_0^&lt;em&gt;) = \begin{cases} p_0^&lt;/em&gt; &amp;amp; \text{if }k=1, \\&lt;br&gt;
-1-p_0^* &amp;amp; \text {if }k=0.\end{cases}$$&lt;/p&gt;
-&lt;h3 id=&#34;diagrams&#34;&gt;Diagrams&lt;/h3&gt;
-&lt;p&gt;Academic supports a Markdown extension for diagrams. You can enable this feature by toggling the &lt;code&gt;diagram&lt;/code&gt; option in your &lt;code&gt;config/_default/params.toml&lt;/code&gt; file or by adding &lt;code&gt;diagram: true&lt;/code&gt; to your page front matter.&lt;/p&gt;
-&lt;p&gt;An example &lt;strong&gt;flowchart&lt;/strong&gt;:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;```mermaid
-graph TD
-A[Hard] --&amp;gt;|Text| B(Round)
-B --&amp;gt; C{Decision}
-C --&amp;gt;|One| D[Result 1]
-C --&amp;gt;|Two| E[Result 2]
-```
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;renders as&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-mermaid&#34;&gt;graph TD
-A[Hard] --&amp;gt;|Text| B(Round)
-B --&amp;gt; C{Decision}
-C --&amp;gt;|One| D[Result 1]
-C --&amp;gt;|Two| E[Result 2]
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;An example &lt;strong&gt;sequence diagram&lt;/strong&gt;:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;```mermaid
-sequenceDiagram
-Alice-&amp;gt;&amp;gt;John: Hello John, how are you?
-loop Healthcheck
-    John-&amp;gt;&amp;gt;John: Fight against hypochondria
-end
-Note right of John: Rational thoughts!
-John--&amp;gt;&amp;gt;Alice: Great!
-John-&amp;gt;&amp;gt;Bob: How about you?
-Bob--&amp;gt;&amp;gt;John: Jolly good!
-```
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;renders as&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-mermaid&#34;&gt;sequenceDiagram
-Alice-&amp;gt;&amp;gt;John: Hello John, how are you?
-loop Healthcheck
-    John-&amp;gt;&amp;gt;John: Fight against hypochondria
-end
-Note right of John: Rational thoughts!
-John--&amp;gt;&amp;gt;Alice: Great!
-John-&amp;gt;&amp;gt;Bob: How about you?
-Bob--&amp;gt;&amp;gt;John: Jolly good!
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;An example &lt;strong&gt;Gantt diagram&lt;/strong&gt;:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;```mermaid
-gantt
-section Section
-Completed :done,    des1, 2014-01-06,2014-01-08
-Active        :active,  des2, 2014-01-07, 3d
-Parallel 1   :         des3, after des1, 1d
-Parallel 2   :         des4, after des1, 1d
-Parallel 3   :         des5, after des3, 1d
-Parallel 4   :         des6, after des4, 1d
-```
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;renders as&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-mermaid&#34;&gt;gantt
-section Section
-Completed :done,    des1, 2014-01-06,2014-01-08
-Active        :active,  des2, 2014-01-07, 3d
-Parallel 1   :         des3, after des1, 1d
-Parallel 2   :         des4, after des1, 1d
-Parallel 3   :         des5, after des3, 1d
-Parallel 4   :         des6, after des4, 1d
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;An example &lt;strong&gt;class diagram&lt;/strong&gt;:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;```mermaid
-classDiagram
-Class01 &amp;lt;|-- AveryLongClass : Cool
-&amp;lt;&amp;lt;interface&amp;gt;&amp;gt; Class01
-Class09 --&amp;gt; C2 : Where am i?
-Class09 --* C3
-Class09 --|&amp;gt; Class07
-Class07 : equals()
-Class07 : Object[] elementData
-Class01 : size()
-Class01 : int chimp
-Class01 : int gorilla
-class Class10 {
-  &amp;lt;&amp;lt;service&amp;gt;&amp;gt;
-  int id
-  size()
-}
-```
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;renders as&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-mermaid&#34;&gt;classDiagram
-Class01 &amp;lt;|-- AveryLongClass : Cool
-&amp;lt;&amp;lt;interface&amp;gt;&amp;gt; Class01
-Class09 --&amp;gt; C2 : Where am i?
-Class09 --* C3
-Class09 --|&amp;gt; Class07
-Class07 : equals()
-Class07 : Object[] elementData
-Class01 : size()
-Class01 : int chimp
-Class01 : int gorilla
-class Class10 {
-  &amp;lt;&amp;lt;service&amp;gt;&amp;gt;
-  int id
-  size()
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;An example &lt;strong&gt;state diagram&lt;/strong&gt;:&lt;/p&gt;
-&lt;pre&gt;&lt;code&gt;```mermaid
-stateDiagram
-[*] --&amp;gt; Still
-Still --&amp;gt; [*]
-Still --&amp;gt; Moving
-Moving --&amp;gt; Still
-Moving --&amp;gt; Crash
-Crash --&amp;gt; [*]
-```
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;renders as&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-mermaid&#34;&gt;stateDiagram
-[*] --&amp;gt; Still
-Still --&amp;gt; [*]
-Still --&amp;gt; Moving
-Moving --&amp;gt; Still
-Moving --&amp;gt; Crash
-Crash --&amp;gt; [*]
-&lt;/code&gt;&lt;/pre&gt;
-&lt;h3 id=&#34;todo-lists&#34;&gt;Todo lists&lt;/h3&gt;
-&lt;p&gt;You can even write your todo lists in Academic too:&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-markdown&#34;&gt;- [x] Write math example
-- [x] Write diagram example
-- [ ] Do something else
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;renders as&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;input checked=&#34;&#34; disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; Write math example&lt;/li&gt;
-&lt;li&gt;&lt;input checked=&#34;&#34; disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; Write diagram example&lt;/li&gt;
-&lt;li&gt;&lt;input disabled=&#34;&#34; type=&#34;checkbox&#34;&gt; Do something else&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&#34;tables&#34;&gt;Tables&lt;/h3&gt;
-&lt;p&gt;Represent your data in tables:&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-markdown&#34;&gt;| First Header  | Second Header |
-| ------------- | ------------- |
-| Content Cell  | Content Cell  |
-| Content Cell  | Content Cell  |
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;renders as&lt;/p&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;First Header&lt;/th&gt;
-&lt;th&gt;Second Header&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;Content Cell&lt;/td&gt;
-&lt;td&gt;Content Cell&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;Content Cell&lt;/td&gt;
-&lt;td&gt;Content Cell&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;h3 id=&#34;callouts&#34;&gt;Callouts&lt;/h3&gt;
-&lt;p&gt;Academic supports a &lt;a href=&#34;https://sourcethemes.com/academic/docs/writing-markdown-latex/#alerts&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;shortcode for callouts&lt;/a&gt;, also referred to as &lt;em&gt;asides&lt;/em&gt;, &lt;em&gt;hints&lt;/em&gt;, or &lt;em&gt;alerts&lt;/em&gt;. By wrapping a paragraph in &lt;code&gt;{{% alert note %}} ... {{% /alert %}}&lt;/code&gt;, it will render as an aside.&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-markdown&#34;&gt;{{% alert note %}}
-A Markdown aside is useful for displaying notices, hints, or definitions to your readers.
-{{% /alert %}}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;renders as&lt;/p&gt;
-&lt;div class=&#34;alert alert-note&#34;&gt;
-  &lt;div&gt;
-    A Markdown aside is useful for displaying notices, hints, or definitions to your readers.
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;h3 id=&#34;spoilers&#34;&gt;Spoilers&lt;/h3&gt;
-&lt;p&gt;Add a spoiler to a page to reveal text, such as an answer to a question, after a button is clicked.&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-markdown&#34;&gt;{{&amp;lt; spoiler text=&amp;quot;Click to view the spoiler&amp;quot; &amp;gt;}}
-You found me!
-{{&amp;lt; /spoiler &amp;gt;}}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;renders as&lt;/p&gt;
-&lt;div class=&#34;spoiler &#34; &gt;
-  &lt;p&gt;
-    &lt;a class=&#34;btn btn-primary&#34; data-toggle=&#34;collapse&#34; href=&#34;#spoiler-2&#34; role=&#34;button&#34; aria-expanded=&#34;false&#34; aria-controls=&#34;spoiler-2&#34;&gt;
-      Click to view the spoiler
-    &lt;/a&gt;
-  &lt;/p&gt;
-  &lt;div class=&#34;collapse card &#34; id=&#34;spoiler-2&#34;&gt;
-    &lt;div class=&#34;card-body&#34;&gt;
-      You found me!
-    &lt;/div&gt;
-  &lt;/div&gt;
-&lt;/div&gt;
-&lt;h3 id=&#34;icons&#34;&gt;Icons&lt;/h3&gt;
-&lt;p&gt;Academic enables you to use a wide range of &lt;a href=&#34;https://sourcethemes.com/academic/docs/page-builder/#icons&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;icons from &lt;em&gt;Font Awesome&lt;/em&gt; and &lt;em&gt;Academicons&lt;/em&gt;&lt;/a&gt; in addition to &lt;a href=&#34;https://sourcethemes.com/academic/docs/writing-markdown-latex/#emojis&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;emojis&lt;/a&gt;.&lt;/p&gt;
-&lt;p&gt;Here are some examples using the &lt;code&gt;icon&lt;/code&gt; shortcode to render icons:&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&#34;language-markdown&#34;&gt;{{&amp;lt; icon name=&amp;quot;terminal&amp;quot; pack=&amp;quot;fas&amp;quot; &amp;gt;}} Terminal  
-{{&amp;lt; icon name=&amp;quot;python&amp;quot; pack=&amp;quot;fab&amp;quot; &amp;gt;}} Python  
-{{&amp;lt; icon name=&amp;quot;r-project&amp;quot; pack=&amp;quot;fab&amp;quot; &amp;gt;}} R
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;renders as&lt;/p&gt;
-&lt;p&gt;
-  &lt;i class=&#34;fas fa-terminal  pr-1 fa-fw&#34;&gt;&lt;/i&gt; Terminal&lt;br&gt;
 
-  &lt;i class=&#34;fab fa-python  pr-1 fa-fw&#34;&gt;&lt;/i&gt; Python&lt;br&gt;
 
-  &lt;i class=&#34;fab fa-r-project  pr-1 fa-fw&#34;&gt;&lt;/i&gt; R&lt;/p&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure id=&#34;figure-two-main-characters-kogami-and-mikishima-in-psycho-pass-photo-from-wallpaperaccesshttpswallpaperaccesscompsycho-pass&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/master/static/media/psycho-pass.jpg&#34; data-caption=&#34;Two Main Characters (Kogami and Mikishima) in Psycho Pass. Photo from &amp;lt;a href=&amp;#34;https://wallpaperaccess.com/psycho-pass&amp;#34;&amp;gt;wallpaperaccess&amp;lt;/a&amp;gt;&#34;&gt;
+
+
+  &lt;img src=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/master/static/media/psycho-pass.jpg&#34; alt=&#34;&#34;  &gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Two Main Characters (Kogami and Mikishima) in Psycho Pass. Photo from &lt;a href=&#34;https://wallpaperaccess.com/psycho-pass&#34;&gt;wallpaperaccess&lt;/a&gt;
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;Yeah, it may seem weird to hear that from an NLP student, but unfortunately, at least in some parts, it is true. I know it depends on how I define morality, but I think you may agree with me in the general case. It first came into my mind when I was watching &lt;a href=&#34;https://en.wikipedia.org/wiki/Psycho-Pass&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;‘psycho pass’&lt;/a&gt; anime. In the first minutes of it, or by just reading the summary before watching, you will understand that it is about a society that is precisely monitored by AI. Identifying potential criminals, and preventing the possible crimes, predicting the proper job for everyone, etc. I do not want to spoil the serie, and I do not know how it will end because the rest of it is under production. But by just knowing some of these concepts, some questions triggered in my mind. I asked &lt;a href=&#34;https://dirkhovy.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Dirk Hovy&lt;/a&gt; , the famous researcher in the field of ethics in AI, about some of them at ACL 2020, and he agreed, and then I understood that these are concerning questions that can seriously affect our future. Let me tell you some of them:&lt;/p&gt;
+&lt;h3 id=&#34;1-with-perfect-ai-models-hope-will-not-exist-anymore&#34;&gt;1. With perfect AI models, hope will not exist anymore&lt;/h3&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure id=&#34;figure-photo-from-shutterstockhttpswwwshutterstockcom&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/b3ae473bb7177446b2416b4e73f7d56ffb792763/static/media/hope.gif&#34; data-caption=&#34;Photo from &amp;lt;a href=&amp;#34;https://www.shutterstock.com/&amp;#34;&amp;gt;shutterstock&amp;lt;/a&amp;gt;&#34;&gt;
+
+
+  &lt;img src=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/b3ae473bb7177446b2416b4e73f7d56ffb792763/static/media/hope.gif&#34; alt=&#34;&#34;  &gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Photo from &lt;a href=&#34;https://www.shutterstock.com/&#34;&gt;shutterstock&lt;/a&gt;
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;Unfortunately, that is true. Suppose a kid who is trying to be a literature teacher, but his talent is in mathematics. A perfect model will decide that he is expected to be a mathematician rather than a poet or a literature teacher. From a broader perspective, each individual might only have a few options to pursue to build the most productive community. Sadly, our models are not capable of understanding our feelings and senses. They merely can interpret them by using the way we express ourselves in a limited manner. This is not sufficient, nor is it proper for understanding someone’s inner feelings.&lt;/p&gt;
+&lt;h3 id=&#34;2-no-one-will-think-outside-of-the-box-anymore&#34;&gt;2. No one will think outside of the box anymore&lt;/h3&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure id=&#34;figure-photo-by-markus-spiskehttpsunsplashcommarkusspiskeutm_sourcemediumutm_mediumreferral-on-unsplashhttpsunsplashcom&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/4774499face7ac420ac86348714d6c47cfc94adb/static/media/box.jpg&#34; data-caption=&#34;Photo by &amp;lt;a href=&amp;#34;https://unsplash.com/@markusspiske?utm_source=medium&amp;amp;amp;utm_medium=referral&amp;#34;&amp;gt;Markus Spiske&amp;lt;/a&amp;gt; on &amp;lt;a href=&amp;#34;https://unsplash.com/&amp;#34;&amp;gt;Unsplash&amp;lt;/a&amp;gt;&#34;&gt;
+
+
+  &lt;img src=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/4774499face7ac420ac86348714d6c47cfc94adb/static/media/box.jpg&#34; alt=&#34;&#34;  &gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Photo by &lt;a href=&#34;https://unsplash.com/@markusspiske?utm_source=medium&amp;amp;utm_medium=referral&#34;&gt;Markus Spiske&lt;/a&gt; on &lt;a href=&#34;https://unsplash.com/&#34;&gt;Unsplash&lt;/a&gt;
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;Creativity is a common phenomenon that we realize is much more than just producing some apparently new things by combining the available ones. &lt;a href=&#34;https://en.wikipedia.org/wiki/Generative_adversarial_network&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GAN&lt;/a&gt; and &lt;a href=&#34;https://en.wikipedia.org/wiki/Deepfake&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;DeepFake&lt;/a&gt; models are trying to do so, as well as &lt;a href=&#34;https://en.wikipedia.org/wiki/GPT-3&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GPT-3&lt;/a&gt; for Natural Language Generation. Suppose a sage who knows everything on the internet. Does a generative model like GPT-3 produce a novel article or even a paragraph that surprises the sage? The answer is no. Because everything it generates is somehow available on the internet. You first may become amazed by reading the Guardian’s &lt;a href=&#34;https://www.theguardian.com/commentisfree/2020/sep/08/robot-wrote-this-article-gpt-3&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;“why humans have nothing to fear from AI”&lt;/a&gt; article . But the truth is that the model just decides which concepts and words are appropriate to be written by remembering the memorized texts. If you disagree, have a look at this &lt;a href=&#34;https://www.youtube.com/watch?v=SY5PvZrJhLE&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;scientific explanation&lt;/a&gt; by Yannic Kilcher. Some new methods such as &lt;a href=&#34;https://sentic.net/senticnet-6.pdf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;SenticNet&lt;/a&gt;, tried to combine human logic into subsymbolic AI, to make models that understand more and can predict better in the way we think. The idea is inspired by this wise saying:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;“you do not get discoveries in the sciences by taking huge amounts of data, throwing them into a computer and doing statistical analysis of them: that’s not the way you understand things, you have to have theoretical insights.”&lt;/strong&gt;   &lt;em&gt;Noam Chomsky&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Despite all these efforts, the problem has not been solved yet. You may think that this limitation is not a significant concern. But as we go further, the situation becomes more serious. Our models will become more accurate, and then they will monitor our activities. Imagine the case that you write a pure novel book, completely different from all the previous ones. Models will now evaluate your manuscript to identify where should it deserve to be published. Since your work is unalike from the prior successful publications, it probably will not get accepted as valuable work. Hence, your creativity will be suppressed. All of this is because it does not understand more than what has been learned before. It cannot digest the creativity.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;“We shape our tools and, thereafter, our tools shape us”&lt;/strong&gt;    &lt;em&gt;Marshall McLuhan&lt;/em&gt;&lt;/p&gt;
+&lt;h3 id=&#34;3-freedom-in-a-cage-the-myth-of-evolution&#34;&gt;3. Freedom in a cage, the myth of evolution&lt;/h3&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure id=&#34;figure-freedom-cage-published-november-27-2012-by-sherif-arafa-politicalcartoonscom&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/master/static/media/cage.png&#34; data-caption=&#34;Freedom Cage published November 27, 2012 by Sherif Arafa politicalcartoons.com&#34;&gt;
+
+
+  &lt;img src=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/master/static/media/cage.png&#34; alt=&#34;&#34;  &gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Freedom Cage published November 27, 2012 by Sherif Arafa politicalcartoons.com
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;This is one of the consequences of the previous topic. Let me rephrase the quote above: They shape our tools; thereafter, our tools govern us. That is the fact. Keep in mind that your current wellbeing is for the sake of previous revolutions, people who tried to change the situation to make a better world. When censorship became automatic, by using methods such as Deep Packet Inception, nobody will be free anymore. This is not only the creativity that is suppressed but also the freedom, and everything that endangers the benefits of current government will be sacrificed. Rulers become cruel, and they eliminate everything that threatens their dictatorship. That is not a complex problem because the models magnify their acts, and they only should be concern about reducing False-negative predictions, individuals who are capable of rebellion and labeled as innocent. ‘Recall’ should be high, and anything else does not matter. If we reach this state, the evolution of society will be halted.&lt;/p&gt;
+&lt;h3 id=&#34;4-the-distance-between-social-classes-will-be-fixed-or-gradually-widen&#34;&gt;4. The distance between social classes will be fixed, or gradually widen.&lt;/h3&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure id=&#34;figure-districts-of-panem-photo-from-businessinsiderhttpswwwbusinessinsidercom10-things-you-need-to-know-about-the-hunger-games-2012-3internationaltruerusirtthe-characters-live-in-districts-4&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/master/static/media/penam.gif&#34; data-caption=&#34;Districts of Panem. Photo from &amp;lt;a href=&amp;#34;https://www.businessinsider.com/10-things-you-need-to-know-about-the-hunger-games-2012-3?international=true&amp;amp;amp;r=US&amp;amp;amp;IR=T#the-characters-live-in-districts-4&amp;#34;&amp;gt;businessinsider&amp;lt;/a&amp;gt;&#34;&gt;
+
+
+  &lt;img src=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/master/static/media/penam.gif&#34; alt=&#34;&#34;  &gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Districts of Panem. Photo from &lt;a href=&#34;https://www.businessinsider.com/10-things-you-need-to-know-about-the-hunger-games-2012-3?international=true&amp;amp;r=US&amp;amp;IR=T#the-characters-live-in-districts-4&#34;&gt;businessinsider&lt;/a&gt;
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;This heading is partially connected with the first one. The problem arises when you are restricted to perform specific tasks based on your background. If we scrutinize this issue, the tasks are chosen based on our ancestors’ previous successful experience. It means, if you were born in a wealthy family, higher-quality jobs are probable to be assigned to you, and if your family is not wealthy, you might not have a chance to improve it. Rich people become richer and poor ones become poorer. This issue can also be extended to other areas such as social classes because all these problems are somehow intertwined. This social class division is demonstrated in &lt;a href=&#34;https://en.wikipedia.org/wiki/The_Hunger_Games&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;The Hunger Games&lt;/a&gt; series of novels and movies. This issue encompasses not only individuals but also communities. Each society section will become isolated, and all unnecessary interactions between districts might be eliminated. And a day may come that you will not understand situations and things beyond your own community, and you may not know that they exist.&lt;/p&gt;
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;This post may be somehow pessimistic, somehow far from reality, but anyway, these are concerns that I think this issue deserves more attention. Some of them may be wrong, but I believe devoting some time to think about our field’s probable destination, even if it might be wrong, is necessary.&lt;/p&gt;
+&lt;p&gt;If you disagree with me or have recommendations and comments, I appreciate if you write it in the comments.&lt;/p&gt;
+&lt;h3 id=&#34;did-you-find-this-page-helpful-consider-sharing-it-&#34;&gt;Did you find this page helpful? Consider sharing it 🙌&lt;/h3&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>If I was a machine, part 1: The future may not be as beautiful as we think.</title>
+      <link>https://amirmohammadkz.github.io/post/post2/</link>
+      <pubDate>Sun, 27 Sep 2020 00:00:00 +0000</pubDate>
+      <guid>https://amirmohammadkz.github.io/post/post2/</guid>
+      <description>&lt;p&gt;Hello, this is the first part of this serie. In this story, I try to question some of the dark sides of AI, which I think are forgotten or neglected.&lt;/p&gt;
+&lt;h3 id=&#34;why-should-you-read-this&#34;&gt;Why should you read this?&lt;/h3&gt;
+&lt;p&gt;This story is not a state-of-the-art paper explanation, nor is it a pure academic article. As a recent graduate research student learning NLP to leverage it in psychology and social science, I will share my thoughts with you. I believe that we are inherently creative, and the structure of learning, and the way we restrict ourselves in the systems, will deteriorate it. Inevitably, I should follow a similar path as other students did, and I think my creative aspect will be diminished because the whole process is a spoiler path. We are bombarded with pure knowledge without finding out what the problem is and how we can invent a solution. Limited in the fixed study routines, trying to read all the requirements of a problem, and then we are expected to design and create after it. But how can we do it? This process, each step of this trail, contains a host of opportunities for creating. However, we are obligated to study all the requirements first because the chance of inventing something that is not made before and performs better is not high. It might be right, but we are improving this chance in the cost of sacrificing creativity, the essential tool for producing novelty. So, I decided not to follow the typical path and make my way a bit slower. I try to do this by guessing the next step each time I learn a new subject, questioning the most prominent drawbacks of current methods before jumping into state-of-the-art discussions from the most famous researchers.
+By following these steps, I may go outside of the box, because I do not know where the box is now, that is the key. When I am aware of the box, outside can be interpreted as a new box, “the box of outside”. Maybe the first chapters are a bit rusty and unstructured, but I try to improve it bit by bit. So, if you agree with me, follow my journey.&lt;/p&gt;
+&lt;h2 id=&#34;nlp-and-ai-are-against-morality&#34;&gt;NLP and AI are against morality&lt;/h2&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure id=&#34;figure-two-main-characters-kogami-and-mikishima-in-psycho-pass-photo-from-wallpaperaccesshttpswallpaperaccesscompsycho-pass&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/master/static/media/psycho-pass.jpg&#34; data-caption=&#34;Two Main Characters (Kogami and Mikishima) in Psycho Pass. Photo from &amp;lt;a href=&amp;#34;https://wallpaperaccess.com/psycho-pass&amp;#34;&amp;gt;wallpaperaccess&amp;lt;/a&amp;gt;&#34;&gt;
+
+
+  &lt;img src=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/master/static/media/psycho-pass.jpg&#34; alt=&#34;&#34;  &gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Two Main Characters (Kogami and Mikishima) in Psycho Pass. Photo from &lt;a href=&#34;https://wallpaperaccess.com/psycho-pass&#34;&gt;wallpaperaccess&lt;/a&gt;
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;Yeah, it may seem weird to hear that from an NLP student, but unfortunately, at least in some parts, it is true. I know it depends on how I define morality, but I think you may agree with me in the general case. It first came into my mind when I was watching &lt;a href=&#34;https://en.wikipedia.org/wiki/Psycho-Pass&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;‘psycho pass’&lt;/a&gt; anime. In the first minutes of it, or by just reading the summary before watching, you will understand that it is about a society that is precisely monitored by AI. Identifying potential criminals, and preventing the possible crimes, predicting the proper job for everyone, etc. I do not want to spoil the serie, and I do not know how it will end because the rest of it is under production. But by just knowing some of these concepts, some questions triggered in my mind. I asked &lt;a href=&#34;https://dirkhovy.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Dirk Hovy&lt;/a&gt; , the famous researcher in the field of ethics in AI, about some of them at ACL 2020, and he agreed, and then I understood that these are concerning questions that can seriously affect our future. Let me tell you some of them:&lt;/p&gt;
+&lt;h3 id=&#34;1-with-perfect-ai-models-hope-will-not-exist-anymore&#34;&gt;1. With perfect AI models, hope will not exist anymore&lt;/h3&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure id=&#34;figure-photo-from-shutterstockhttpswwwshutterstockcom&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/b3ae473bb7177446b2416b4e73f7d56ffb792763/static/media/hope.gif&#34; data-caption=&#34;Photo from &amp;lt;a href=&amp;#34;https://www.shutterstock.com/&amp;#34;&amp;gt;shutterstock&amp;lt;/a&amp;gt;&#34;&gt;
+
+
+  &lt;img src=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/b3ae473bb7177446b2416b4e73f7d56ffb792763/static/media/hope.gif&#34; alt=&#34;&#34;  &gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Photo from &lt;a href=&#34;https://www.shutterstock.com/&#34;&gt;shutterstock&lt;/a&gt;
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;Unfortunately, that is true. Suppose a kid who is trying to be a literature teacher, but his talent is in mathematics. A perfect model will decide that he is expected to be a mathematician rather than a poet or a literature teacher. From a broader perspective, each individual might only have a few options to pursue to build the most productive community. Sadly, our models are not capable of understanding our feelings and senses. They merely can interpret them by using the way we express ourselves in a limited manner. This is not sufficient, nor is it proper for understanding someone’s inner feelings.&lt;/p&gt;
+&lt;h3 id=&#34;2-no-one-will-think-outside-of-the-box-anymore&#34;&gt;2. No one will think outside of the box anymore&lt;/h3&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure id=&#34;figure-photo-by-markus-spiskehttpsunsplashcommarkusspiskeutm_sourcemediumutm_mediumreferral-on-unsplashhttpsunsplashcom&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/4774499face7ac420ac86348714d6c47cfc94adb/static/media/box.jpg&#34; data-caption=&#34;Photo by &amp;lt;a href=&amp;#34;https://unsplash.com/@markusspiske?utm_source=medium&amp;amp;amp;utm_medium=referral&amp;#34;&amp;gt;Markus Spiske&amp;lt;/a&amp;gt; on &amp;lt;a href=&amp;#34;https://unsplash.com/&amp;#34;&amp;gt;Unsplash&amp;lt;/a&amp;gt;&#34;&gt;
+
+
+  &lt;img src=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/4774499face7ac420ac86348714d6c47cfc94adb/static/media/box.jpg&#34; alt=&#34;&#34;  &gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Photo by &lt;a href=&#34;https://unsplash.com/@markusspiske?utm_source=medium&amp;amp;utm_medium=referral&#34;&gt;Markus Spiske&lt;/a&gt; on &lt;a href=&#34;https://unsplash.com/&#34;&gt;Unsplash&lt;/a&gt;
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;Creativity is a common phenomenon that we realize is much more than just producing some apparently new things by combining the available ones. &lt;a href=&#34;https://en.wikipedia.org/wiki/Generative_adversarial_network&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GAN&lt;/a&gt; and &lt;a href=&#34;https://en.wikipedia.org/wiki/Deepfake&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;DeepFake&lt;/a&gt; models are trying to do so, as well as &lt;a href=&#34;https://en.wikipedia.org/wiki/GPT-3&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GPT-3&lt;/a&gt; for Natural Language Generation. Suppose a sage who knows everything on the internet. Does a generative model like GPT-3 produce a novel article or even a paragraph that surprises the sage? The answer is no. Because everything it generates is somehow available on the internet. You first may become amazed by reading the Guardian’s &lt;a href=&#34;https://www.theguardian.com/commentisfree/2020/sep/08/robot-wrote-this-article-gpt-3&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;“why humans have nothing to fear from AI”&lt;/a&gt; article . But the truth is that the model just decides which concepts and words are appropriate to be written by remembering the memorized texts. If you disagree, have a look at this &lt;a href=&#34;https://www.youtube.com/watch?v=SY5PvZrJhLE&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;scientific explanation&lt;/a&gt; by Yannic Kilcher. Some new methods such as &lt;a href=&#34;https://sentic.net/senticnet-6.pdf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;SenticNet&lt;/a&gt;, tried to combine human logic into subsymbolic AI, to make models that understand more and can predict better in the way we think. The idea is inspired by this wise saying:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;“you do not get discoveries in the sciences by taking huge amounts of data, throwing them into a computer and doing statistical analysis of them: that’s not the way you understand things, you have to have theoretical insights.”&lt;/strong&gt;   &lt;em&gt;Noam Chomsky&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Despite all these efforts, the problem has not been solved yet. You may think that this limitation is not a significant concern. But as we go further, the situation becomes more serious. Our models will become more accurate, and then they will monitor our activities. Imagine the case that you write a pure novel book, completely different from all the previous ones. Models will now evaluate your manuscript to identify where should it deserve to be published. Since your work is unalike from the prior successful publications, it probably will not get accepted as valuable work. Hence, your creativity will be suppressed. All of this is because it does not understand more than what has been learned before. It cannot digest the creativity.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;“We shape our tools and, thereafter, our tools shape us”&lt;/strong&gt;    &lt;em&gt;Marshall McLuhan&lt;/em&gt;&lt;/p&gt;
+&lt;h3 id=&#34;3-freedom-in-a-cage-the-myth-of-evolution&#34;&gt;3. Freedom in a cage, the myth of evolution&lt;/h3&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure id=&#34;figure-freedom-cage-published-november-27-2012-by-sherif-arafa-politicalcartoonscom&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/master/static/media/cage.png&#34; data-caption=&#34;Freedom Cage published November 27, 2012 by Sherif Arafa politicalcartoons.com&#34;&gt;
+
+
+  &lt;img src=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/master/static/media/cage.png&#34; alt=&#34;&#34;  &gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Freedom Cage published November 27, 2012 by Sherif Arafa politicalcartoons.com
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;This is one of the consequences of the previous topic. Let me rephrase the quote above: They shape our tools; thereafter, our tools govern us. That is the fact. Keep in mind that your current wellbeing is for the sake of previous revolutions, people who tried to change the situation to make a better world. When censorship became automatic, by using methods such as Deep Packet Inception, nobody will be free anymore. This is not only the creativity that is suppressed but also the freedom, and everything that endangers the benefits of current government will be sacrificed. Rulers become cruel, and they eliminate everything that threatens their dictatorship. That is not a complex problem because the models magnify their acts, and they only should be concern about reducing False-negative predictions, individuals who are capable of rebellion and labeled as innocent. ‘Recall’ should be high, and anything else does not matter. If we reach this state, the evolution of society will be halted.&lt;/p&gt;
+&lt;h3 id=&#34;4-the-distance-between-social-classes-will-be-fixed-or-gradually-widen&#34;&gt;4. The distance between social classes will be fixed, or gradually widen.&lt;/h3&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure id=&#34;figure-districts-of-panem-photo-from-businessinsiderhttpswwwbusinessinsidercom10-things-you-need-to-know-about-the-hunger-games-2012-3internationaltruerusirtthe-characters-live-in-districts-4&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/master/static/media/penam.gif&#34; data-caption=&#34;Districts of Panem. Photo from &amp;lt;a href=&amp;#34;https://www.businessinsider.com/10-things-you-need-to-know-about-the-hunger-games-2012-3?international=true&amp;amp;amp;r=US&amp;amp;amp;IR=T#the-characters-live-in-districts-4&amp;#34;&amp;gt;businessinsider&amp;lt;/a&amp;gt;&#34;&gt;
+
+
+  &lt;img src=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/master/static/media/penam.gif&#34; alt=&#34;&#34;  &gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Districts of Panem. Photo from &lt;a href=&#34;https://www.businessinsider.com/10-things-you-need-to-know-about-the-hunger-games-2012-3?international=true&amp;amp;r=US&amp;amp;IR=T#the-characters-live-in-districts-4&#34;&gt;businessinsider&lt;/a&gt;
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;This heading is partially connected with the first one. The problem arises when you are restricted to perform specific tasks based on your background. If we scrutinize this issue, the tasks are chosen based on our ancestors’ previous successful experience. It means, if you were born in a wealthy family, higher-quality jobs are probable to be assigned to you, and if your family is not wealthy, you might not have a chance to improve it. Rich people become richer and poor ones become poorer. This issue can also be extended to other areas such as social classes because all these problems are somehow intertwined. This social class division is demonstrated in &lt;a href=&#34;https://en.wikipedia.org/wiki/The_Hunger_Games&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;The Hunger Games&lt;/a&gt; series of novels and movies. This issue encompasses not only individuals but also communities. Each society section will become isolated, and all unnecessary interactions between districts might be eliminated. And a day may come that you will not understand situations and things beyond your own community, and you may not know that they exist.&lt;/p&gt;
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;This post may be somehow pessimistic, somehow far from reality, but anyway, these are concerns that I think this issue deserves more attention. Some of them may be wrong, but I believe devoting some time to think about our field’s probable destination, even if it might be wrong, is necessary.&lt;/p&gt;
+&lt;p&gt;If you disagree with me or have recommendations and comments, I appreciate if you write it in the comments.&lt;/p&gt;
+&lt;h3 id=&#34;did-you-find-this-page-helpful-consider-sharing-it-&#34;&gt;Did you find this page helpful? Consider sharing it 🙌&lt;/h3&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>If I was a machine, part 1: The future may not be as beautiful as we think.</title>
+      <link>https://amirmohammadkz.github.io/post/post3/</link>
+      <pubDate>Sun, 27 Sep 2020 00:00:00 +0000</pubDate>
+      <guid>https://amirmohammadkz.github.io/post/post3/</guid>
+      <description>&lt;p&gt;Hello, this is the first part of this serie. In this story, I try to question some of the dark sides of AI, which I think are forgotten or neglected.&lt;/p&gt;
+&lt;h3 id=&#34;why-should-you-read-this&#34;&gt;Why should you read this?&lt;/h3&gt;
+&lt;p&gt;This story is not a state-of-the-art paper explanation, nor is it a pure academic article. As a recent graduate research student learning NLP to leverage it in psychology and social science, I will share my thoughts with you. I believe that we are inherently creative, and the structure of learning, and the way we restrict ourselves in the systems, will deteriorate it. Inevitably, I should follow a similar path as other students did, and I think my creative aspect will be diminished because the whole process is a spoiler path. We are bombarded with pure knowledge without finding out what the problem is and how we can invent a solution. Limited in the fixed study routines, trying to read all the requirements of a problem, and then we are expected to design and create after it. But how can we do it? This process, each step of this trail, contains a host of opportunities for creating. However, we are obligated to study all the requirements first because the chance of inventing something that is not made before and performs better is not high. It might be right, but we are improving this chance in the cost of sacrificing creativity, the essential tool for producing novelty. So, I decided not to follow the typical path and make my way a bit slower. I try to do this by guessing the next step each time I learn a new subject, questioning the most prominent drawbacks of current methods before jumping into state-of-the-art discussions from the most famous researchers.
+By following these steps, I may go outside of the box, because I do not know where the box is now, that is the key. When I am aware of the box, outside can be interpreted as a new box, “the box of outside”. Maybe the first chapters are a bit rusty and unstructured, but I try to improve it bit by bit. So, if you agree with me, follow my journey.&lt;/p&gt;
+&lt;h2 id=&#34;nlp-and-ai-are-against-morality&#34;&gt;NLP and AI are against morality&lt;/h2&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure id=&#34;figure-two-main-characters-kogami-and-mikishima-in-psycho-pass-photo-from-wallpaperaccesshttpswallpaperaccesscompsycho-pass&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/master/static/media/psycho-pass.jpg&#34; data-caption=&#34;Two Main Characters (Kogami and Mikishima) in Psycho Pass. Photo from &amp;lt;a href=&amp;#34;https://wallpaperaccess.com/psycho-pass&amp;#34;&amp;gt;wallpaperaccess&amp;lt;/a&amp;gt;&#34;&gt;
+
+
+  &lt;img src=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/master/static/media/psycho-pass.jpg&#34; alt=&#34;&#34;  &gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Two Main Characters (Kogami and Mikishima) in Psycho Pass. Photo from &lt;a href=&#34;https://wallpaperaccess.com/psycho-pass&#34;&gt;wallpaperaccess&lt;/a&gt;
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;Yeah, it may seem weird to hear that from an NLP student, but unfortunately, at least in some parts, it is true. I know it depends on how I define morality, but I think you may agree with me in the general case. It first came into my mind when I was watching &lt;a href=&#34;https://en.wikipedia.org/wiki/Psycho-Pass&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;‘psycho pass’&lt;/a&gt; anime. In the first minutes of it, or by just reading the summary before watching, you will understand that it is about a society that is precisely monitored by AI. Identifying potential criminals, and preventing the possible crimes, predicting the proper job for everyone, etc. I do not want to spoil the serie, and I do not know how it will end because the rest of it is under production. But by just knowing some of these concepts, some questions triggered in my mind. I asked &lt;a href=&#34;https://dirkhovy.com/&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;Dirk Hovy&lt;/a&gt; , the famous researcher in the field of ethics in AI, about some of them at ACL 2020, and he agreed, and then I understood that these are concerning questions that can seriously affect our future. Let me tell you some of them:&lt;/p&gt;
+&lt;h3 id=&#34;1-with-perfect-ai-models-hope-will-not-exist-anymore&#34;&gt;1. With perfect AI models, hope will not exist anymore&lt;/h3&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure id=&#34;figure-photo-from-shutterstockhttpswwwshutterstockcom&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/b3ae473bb7177446b2416b4e73f7d56ffb792763/static/media/hope.gif&#34; data-caption=&#34;Photo from &amp;lt;a href=&amp;#34;https://www.shutterstock.com/&amp;#34;&amp;gt;shutterstock&amp;lt;/a&amp;gt;&#34;&gt;
+
+
+  &lt;img src=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/b3ae473bb7177446b2416b4e73f7d56ffb792763/static/media/hope.gif&#34; alt=&#34;&#34;  &gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Photo from &lt;a href=&#34;https://www.shutterstock.com/&#34;&gt;shutterstock&lt;/a&gt;
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;Unfortunately, that is true. Suppose a kid who is trying to be a literature teacher, but his talent is in mathematics. A perfect model will decide that he is expected to be a mathematician rather than a poet or a literature teacher. From a broader perspective, each individual might only have a few options to pursue to build the most productive community. Sadly, our models are not capable of understanding our feelings and senses. They merely can interpret them by using the way we express ourselves in a limited manner. This is not sufficient, nor is it proper for understanding someone’s inner feelings.&lt;/p&gt;
+&lt;h3 id=&#34;2-no-one-will-think-outside-of-the-box-anymore&#34;&gt;2. No one will think outside of the box anymore&lt;/h3&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure id=&#34;figure-photo-by-markus-spiskehttpsunsplashcommarkusspiskeutm_sourcemediumutm_mediumreferral-on-unsplashhttpsunsplashcom&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/4774499face7ac420ac86348714d6c47cfc94adb/static/media/box.jpg&#34; data-caption=&#34;Photo by &amp;lt;a href=&amp;#34;https://unsplash.com/@markusspiske?utm_source=medium&amp;amp;amp;utm_medium=referral&amp;#34;&amp;gt;Markus Spiske&amp;lt;/a&amp;gt; on &amp;lt;a href=&amp;#34;https://unsplash.com/&amp;#34;&amp;gt;Unsplash&amp;lt;/a&amp;gt;&#34;&gt;
+
+
+  &lt;img src=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/4774499face7ac420ac86348714d6c47cfc94adb/static/media/box.jpg&#34; alt=&#34;&#34;  &gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Photo by &lt;a href=&#34;https://unsplash.com/@markusspiske?utm_source=medium&amp;amp;utm_medium=referral&#34;&gt;Markus Spiske&lt;/a&gt; on &lt;a href=&#34;https://unsplash.com/&#34;&gt;Unsplash&lt;/a&gt;
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;Creativity is a common phenomenon that we realize is much more than just producing some apparently new things by combining the available ones. &lt;a href=&#34;https://en.wikipedia.org/wiki/Generative_adversarial_network&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GAN&lt;/a&gt; and &lt;a href=&#34;https://en.wikipedia.org/wiki/Deepfake&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;DeepFake&lt;/a&gt; models are trying to do so, as well as &lt;a href=&#34;https://en.wikipedia.org/wiki/GPT-3&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;GPT-3&lt;/a&gt; for Natural Language Generation. Suppose a sage who knows everything on the internet. Does a generative model like GPT-3 produce a novel article or even a paragraph that surprises the sage? The answer is no. Because everything it generates is somehow available on the internet. You first may become amazed by reading the Guardian’s &lt;a href=&#34;https://www.theguardian.com/commentisfree/2020/sep/08/robot-wrote-this-article-gpt-3&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;“why humans have nothing to fear from AI”&lt;/a&gt; article . But the truth is that the model just decides which concepts and words are appropriate to be written by remembering the memorized texts. If you disagree, have a look at this &lt;a href=&#34;https://www.youtube.com/watch?v=SY5PvZrJhLE&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;scientific explanation&lt;/a&gt; by Yannic Kilcher. Some new methods such as &lt;a href=&#34;https://sentic.net/senticnet-6.pdf&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;SenticNet&lt;/a&gt;, tried to combine human logic into subsymbolic AI, to make models that understand more and can predict better in the way we think. The idea is inspired by this wise saying:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;“you do not get discoveries in the sciences by taking huge amounts of data, throwing them into a computer and doing statistical analysis of them: that’s not the way you understand things, you have to have theoretical insights.”&lt;/strong&gt;   &lt;em&gt;Noam Chomsky&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Despite all these efforts, the problem has not been solved yet. You may think that this limitation is not a significant concern. But as we go further, the situation becomes more serious. Our models will become more accurate, and then they will monitor our activities. Imagine the case that you write a pure novel book, completely different from all the previous ones. Models will now evaluate your manuscript to identify where should it deserve to be published. Since your work is unalike from the prior successful publications, it probably will not get accepted as valuable work. Hence, your creativity will be suppressed. All of this is because it does not understand more than what has been learned before. It cannot digest the creativity.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;“We shape our tools and, thereafter, our tools shape us”&lt;/strong&gt;    &lt;em&gt;Marshall McLuhan&lt;/em&gt;&lt;/p&gt;
+&lt;h3 id=&#34;3-freedom-in-a-cage-the-myth-of-evolution&#34;&gt;3. Freedom in a cage, the myth of evolution&lt;/h3&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure id=&#34;figure-freedom-cage-published-november-27-2012-by-sherif-arafa-politicalcartoonscom&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/master/static/media/cage.png&#34; data-caption=&#34;Freedom Cage published November 27, 2012 by Sherif Arafa politicalcartoons.com&#34;&gt;
+
+
+  &lt;img src=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/master/static/media/cage.png&#34; alt=&#34;&#34;  &gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Freedom Cage published November 27, 2012 by Sherif Arafa politicalcartoons.com
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;This is one of the consequences of the previous topic. Let me rephrase the quote above: They shape our tools; thereafter, our tools govern us. That is the fact. Keep in mind that your current wellbeing is for the sake of previous revolutions, people who tried to change the situation to make a better world. When censorship became automatic, by using methods such as Deep Packet Inception, nobody will be free anymore. This is not only the creativity that is suppressed but also the freedom, and everything that endangers the benefits of current government will be sacrificed. Rulers become cruel, and they eliminate everything that threatens their dictatorship. That is not a complex problem because the models magnify their acts, and they only should be concern about reducing False-negative predictions, individuals who are capable of rebellion and labeled as innocent. ‘Recall’ should be high, and anything else does not matter. If we reach this state, the evolution of society will be halted.&lt;/p&gt;
+&lt;h3 id=&#34;4-the-distance-between-social-classes-will-be-fixed-or-gradually-widen&#34;&gt;4. The distance between social classes will be fixed, or gradually widen.&lt;/h3&gt;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+&lt;figure id=&#34;figure-districts-of-panem-photo-from-businessinsiderhttpswwwbusinessinsidercom10-things-you-need-to-know-about-the-hunger-games-2012-3internationaltruerusirtthe-characters-live-in-districts-4&#34;&gt;
+
+
+  &lt;a data-fancybox=&#34;&#34; href=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/master/static/media/penam.gif&#34; data-caption=&#34;Districts of Panem. Photo from &amp;lt;a href=&amp;#34;https://www.businessinsider.com/10-things-you-need-to-know-about-the-hunger-games-2012-3?international=true&amp;amp;amp;r=US&amp;amp;amp;IR=T#the-characters-live-in-districts-4&amp;#34;&amp;gt;businessinsider&amp;lt;/a&amp;gt;&#34;&gt;
+
+
+  &lt;img src=&#34;https://raw.githubusercontent.com/amirmohammadkz/starter-academic/master/static/media/penam.gif&#34; alt=&#34;&#34;  &gt;
+&lt;/a&gt;
+
+
+  
+  
+  &lt;figcaption&gt;
+    Districts of Panem. Photo from &lt;a href=&#34;https://www.businessinsider.com/10-things-you-need-to-know-about-the-hunger-games-2012-3?international=true&amp;amp;r=US&amp;amp;IR=T#the-characters-live-in-districts-4&#34;&gt;businessinsider&lt;/a&gt;
+  &lt;/figcaption&gt;
+
+
+&lt;/figure&gt;
+
+&lt;p&gt;This heading is partially connected with the first one. The problem arises when you are restricted to perform specific tasks based on your background. If we scrutinize this issue, the tasks are chosen based on our ancestors’ previous successful experience. It means, if you were born in a wealthy family, higher-quality jobs are probable to be assigned to you, and if your family is not wealthy, you might not have a chance to improve it. Rich people become richer and poor ones become poorer. This issue can also be extended to other areas such as social classes because all these problems are somehow intertwined. This social class division is demonstrated in &lt;a href=&#34;https://en.wikipedia.org/wiki/The_Hunger_Games&#34; target=&#34;_blank&#34; rel=&#34;noopener&#34;&gt;The Hunger Games&lt;/a&gt; series of novels and movies. This issue encompasses not only individuals but also communities. Each society section will become isolated, and all unnecessary interactions between districts might be eliminated. And a day may come that you will not understand situations and things beyond your own community, and you may not know that they exist.&lt;/p&gt;
+&lt;h2 id=&#34;conclusion&#34;&gt;Conclusion&lt;/h2&gt;
+&lt;p&gt;This post may be somehow pessimistic, somehow far from reality, but anyway, these are concerns that I think this issue deserves more attention. Some of them may be wrong, but I believe devoting some time to think about our field’s probable destination, even if it might be wrong, is necessary.&lt;/p&gt;
+&lt;p&gt;If you disagree with me or have recommendations and comments, I appreciate if you write it in the comments.&lt;/p&gt;
 &lt;h3 id=&#34;did-you-find-this-page-helpful-consider-sharing-it-&#34;&gt;Did you find this page helpful? Consider sharing it 🙌&lt;/h3&gt;
 </description>
     </item>

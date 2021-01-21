@@ -5,12 +5,20 @@
     <link>https://amirmohammadkz.github.io/</link>
       <atom:link href="https://amirmohammadkz.github.io/index.xml" rel="self" type="application/rss+xml" />
     <description>Amirmohammad Kazemeini&#39;s Blog</description>
-    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><lastBuildDate>Sun, 27 Sep 2020 00:00:00 +0000</lastBuildDate>
+    <generator>Wowchemy (https://wowchemy.com)</generator><language>en-us</language><lastBuildDate>Sun, 10 Jan 2021 00:00:00 +0000</lastBuildDate>
     <image>
       <url>https://amirmohammadkz.github.io/images/icon_hu0b7a4cb9992c9ac0e91bd28ffd38dd00_9727_512x512_fill_lanczos_center_2.png</url>
       <title>Amirmohammad Kazemeini&#39;s Blog</title>
       <link>https://amirmohammadkz.github.io/</link>
     </image>
+    
+    <item>
+      <title>Multitask Learning forEmotion and Personality Detection</title>
+      <link>https://amirmohammadkz.github.io/publication/mtl/</link>
+      <pubDate>Sun, 10 Jan 2021 00:00:00 +0000</pubDate>
+      <guid>https://amirmohammadkz.github.io/publication/mtl/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>If I was a machine, part 1: The future may not be as beautiful as we think.</title>
@@ -231,14 +239,6 @@ By following these steps, I may go outside of the box, because I do not know whe
       <link>https://amirmohammadkz.github.io/publication/icdm2020/</link>
       <pubDate>Thu, 24 Sep 2020 00:00:00 +0000</pubDate>
       <guid>https://amirmohammadkz.github.io/publication/icdm2020/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Bottom-up and top-down: Predicting personality with psycholinguistic and language model features</title>
-      <link>https://amirmohammadkz.github.io/publication/mtl/</link>
-      <pubDate>Thu, 24 Sep 2020 00:00:00 +0000</pubDate>
-      <guid>https://amirmohammadkz.github.io/publication/mtl/</guid>
       <description></description>
     </item>
     

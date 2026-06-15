@@ -1,0 +1,823 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Listening Diary - mood day view</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#131019; --panel:#1b1726; --block:#241f33; --block-hi:#2b2540;
+    --border:#2e2840; --border-soft:#241f33; --track:#241f33; --axis:#4a4360;
+    --text:#ece8f4; --muted:#9590ab; --faint:#645d7a;
+    --happy:#F6C95A; --uplifting:#F4A259; --energetic:#EF5E6E; --angry:#C0394F;
+    --romantic:#E985B0; --calm:#57BEA9; --sad:#5E8FD8; --dark:#8A6FE0;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);
+    font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  body{padding:28px clamp(16px,4vw,48px) 64px}
+
+  .topbar{display:flex;align-items:flex-end;justify-content:space-between;
+    gap:24px;flex-wrap:wrap;margin-bottom:6px}
+  .brand h1{font-family:Fraunces,serif;font-weight:500;font-size:30px;
+    letter-spacing:-.01em;margin:0;line-height:1}
+  .brand p{margin:6px 0 0;color:var(--faint);font-size:12.5px}
+  .brand .sample{color:var(--uplifting)}
+  .daynav{display:flex;align-items:center;gap:14px}
+  .daynav button{background:var(--panel);border:1px solid var(--border);
+    color:var(--text);width:34px;height:34px;border-radius:9px;cursor:pointer;
+    font-size:15px;display:grid;place-items:center;transition:.15s}
+  .daynav button:hover:not(:disabled){background:var(--block-hi)}
+  .daynav button:disabled{opacity:.35;cursor:default}
+  .daynav button:focus-visible{outline:2px solid var(--uplifting);outline-offset:2px}
+  .daynav .date{font-family:Fraunces,serif;font-size:20px;font-weight:500;
+    min-width:190px;text-align:center}
+  .daynav .date small{display:block;font-family:Inter;font-weight:400;
+    font-size:11.5px;color:var(--faint);letter-spacing:.04em;margin-top:2px}
+
+  /* in-page sync (server mode only; hidden when opened as a static file) */
+  .syncbox{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .syncbox button{background:var(--uplifting);border:1px solid var(--uplifting);
+    color:#1a1206;font-weight:600;font-size:12.5px;padding:8px 16px;border-radius:9px;
+    cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:.15s}
+  .syncbox button:hover:not(:disabled){filter:brightness(1.08)}
+  .syncbox button:disabled{opacity:.55;cursor:default}
+  .syncbox button:focus-visible{outline:2px solid var(--text);outline-offset:2px}
+  .syncbox .chans{display:flex;gap:10px;font-size:11.5px;color:var(--muted)}
+  .syncbox .chans label{display:inline-flex;align-items:center;gap:4px;cursor:pointer}
+  .syncbox .chans input{accent-color:var(--uplifting);cursor:pointer}
+  .syncbox .sstat{font-family:JetBrains Mono,ui-monospace,monospace;font-size:10.5px;
+    color:var(--faint);min-width:110px}
+  .spin{width:11px;height:11px;border:2px solid rgba(26,18,6,.35);border-top-color:#1a1206;
+    border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .layout{display:grid;grid-template-columns:204px 1fr;gap:22px;margin-top:24px}
+  @media(max-width:780px){.layout{grid-template-columns:1fr}}
+  .rail h2,.main h2{font-size:11px;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--faint);margin:0 0 12px;font-weight:600}
+
+  .month{background:var(--panel);border:1px solid var(--border);border-radius:14px;
+    padding:16px 16px 18px;margin-bottom:12px}
+  .month .mlabel{font-family:JetBrains Mono,ui-monospace,monospace;font-size:12px;
+    color:var(--muted);margin-bottom:10px}
+  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+  .dow{font-size:9.5px;color:var(--faint);text-align:center;
+    font-family:JetBrains Mono,ui-monospace,monospace}
+  .cell{aspect-ratio:1;border-radius:5px;background:#211c2e;cursor:default;
+    border:1px solid transparent;position:relative;transition:.13s}
+  .cell.has{cursor:pointer}
+  .cell.has:hover{transform:scale(1.12);border-color:#4a4360}
+  .cell.sel{outline:2px solid var(--text);outline-offset:1px}
+  .cell .vol{position:absolute;inset:0;border-radius:4px}
+  .rail .note{color:var(--faint);font-size:11px;line-height:1.5;margin-top:6px}
+
+  .legend{margin-top:18px;background:var(--panel);border:1px solid var(--border);
+    border-radius:14px;padding:14px 16px}
+  .legend .row{display:flex;align-items:center;gap:8px;font-size:12px;
+    color:var(--muted);padding:3px 0}
+  .legend .sw{width:11px;height:11px;border-radius:3px;flex:none}
+
+  .summary{background:var(--panel);border:1px solid var(--border);border-radius:14px;
+    padding:16px 18px;margin-bottom:20px}
+  .summary .ttl{display:flex;justify-content:space-between;align-items:baseline;
+    margin-bottom:12px}
+  .summary .ttl span{font-size:12px;color:var(--faint);
+    font-family:JetBrains Mono,ui-monospace,monospace}
+  .sumrow{display:flex;align-items:center;gap:12px;margin:7px 0}
+  .sumrow .lane-tag{width:54px;font-size:10.5px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--muted);text-align:right;flex:none}
+  .spectrum{flex:1;height:16px;border-radius:5px;overflow:hidden;display:flex;
+    background:#211c2e;position:relative}
+  .spectrum i{height:100%;display:block}
+  .spectrum .none{position:absolute;inset:0;display:grid;place-items:center;
+    font-size:9.5px;color:var(--faint);font-style:italic}
+
+  .main h2 .hint{float:right;text-transform:none;letter-spacing:0;
+    font-weight:400;color:var(--faint);font-size:11px}
+  .timeline{display:grid;grid-template-columns:44px 1fr 1fr;gap:0;
+    background:var(--panel);border:1px solid var(--border);border-radius:14px;
+    padding:14px 14px 14px 0;position:relative;overflow:hidden}
+  .lane-heads{grid-column:2 / 4;display:grid;grid-template-columns:1fr 1fr;
+    gap:14px;padding:0 4px 10px 14px}
+  .lane-head{font-size:11.5px;color:var(--muted)}
+  .lane-head b{color:var(--text);font-weight:600}
+  .lane-head .sub{color:var(--faint);font-size:10.5px}
+
+  .track-area{grid-column:1 / 4;display:grid;grid-template-columns:44px 1fr 1fr;
+    gap:0;position:relative}
+  .hours{position:relative}
+  .hour{position:absolute;left:0;right:0;font-family:JetBrains Mono,ui-monospace,monospace;
+    font-size:10px;color:var(--faint);padding-right:8px;text-align:right;
+    transform:translateY(-6px)}
+  .gridline{position:absolute;left:44px;right:0;border-top:1px solid var(--border-soft)}
+  .lane{position:relative;padding:0 7px 0 14px}
+
+  .block{position:absolute;left:14px;right:7px;background:var(--block);
+    border:1px solid var(--border);border-radius:9px;padding:7px 9px;
+    overflow:hidden;transition:.14s;cursor:default}
+  .block:hover{background:var(--block-hi);border-color:#473f5e;z-index:5}
+  .block .bt{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+  .block .name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;
+    text-overflow:ellipsis}
+  .block .time{font-family:JetBrains Mono,ui-monospace,monospace;font-size:9.5px;
+    color:var(--faint);flex:none}
+  .block .artist{font-size:10px;color:var(--muted);white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+  .block .bar{display:flex;height:7px;border-radius:4px;overflow:hidden;
+    margin-top:7px;background:#1a1626}
+  .block .bar i{display:block;height:100%}
+  .block .dom{font-size:9.5px;margin-top:5px;color:var(--muted);
+    display:flex;align-items:center;min-width:0}
+  /* explicit margin (not flex gap) so the dot never sits on the mood's first
+     letter; the label clips with an ellipsis instead of riding under the dot. */
+  .block .dom .dot{width:7px;height:7px;border-radius:50%;flex:none;margin-right:6px}
+  .block .dom .dlbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .block .none{font-size:9.5px;margin-top:6px;color:var(--faint);font-style:italic}
+
+  /* overlay layer over both lanes (44px..right): cluster blocks + divergence tags */
+  .overlay{position:absolute;left:44px;right:0;top:0;pointer-events:none}
+  .overlay > *{pointer-events:auto}
+
+  /* divergence tag between the lanes for a standalone (unclustered) play */
+  .divtag{position:absolute;left:0;right:0;display:flex;justify-content:center;
+    z-index:6;pointer-events:none}
+  .divtag .tag{background:#2a2238;border:1px dashed #6f5fa6;color:#cbbff0;
+    font-size:9.5px;padding:2px 8px;border-radius:20px;
+    font-family:JetBrains Mono,ui-monospace,monospace;white-space:nowrap;
+    box-shadow:0 2px 10px rgba(0,0,0,.35)}
+
+  /* collapsed cluster block (a burst of plays). Click to expand inline -- the
+     per-song detail reflows in below it, never an overlay or hover expansion. */
+  .cluster{position:absolute;left:14px;right:7px;background:var(--block);
+    border:1px solid var(--border);border-radius:9px;padding:8px 11px;
+    transition:.14s;cursor:pointer;z-index:5}
+  .cluster:hover{background:var(--block-hi);border-color:#473f5e;z-index:6}
+  .cluster.inspecting{border-color:#6f5fa6;box-shadow:0 0 0 1px #6f5fa6}
+  .cluster .chead{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .cluster .ctime{font-family:JetBrains Mono,ui-monospace,monospace;font-size:10px;
+    color:var(--faint)}
+  .cluster .cmeta{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:7px}
+  .cluster .dmark{display:inline-flex;align-items:center;gap:5px;color:#cbbff0;
+    background:#2a2238;border:1px dashed #6f5fa6;border-radius:20px;padding:1px 7px;
+    font-size:9.5px;font-family:JetBrains Mono,ui-monospace,monospace}
+  .cluster .dmark .ddot{width:6px;height:6px;border-radius:50%;background:#9a7fe0;flex:none}
+  .cluster .chint{margin-top:5px;font-size:9.5px;color:var(--faint)}
+
+  .block.inspecting{border-color:#6f5fa6;box-shadow:0 0 0 1px #6f5fa6}
+
+  /* cursor-following chart tooltip: the diverging chart itself, not a text list */
+  .tip{position:fixed;z-index:50;background:#0d0b13;border:1px solid #3a3350;
+    border-radius:12px;padding:12px 14px 14px;width:340px;max-width:92vw;
+    pointer-events:none;opacity:0;transition:opacity .1s;
+    box-shadow:0 16px 38px rgba(0,0,0,.55)}
+  .tip .ctitle{font-size:12px;font-weight:600;margin-bottom:9px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tip .ctitle span{color:var(--faint);font-weight:400;font-size:10.5px}
+  .tip .mchart{margin:0}
+  .empty{padding:60px 20px;text-align:center;color:var(--faint);font-size:13px;
+    background:var(--panel);border:1px solid var(--border);border-radius:14px}
+
+  /* --- inline accordion panel (click=expand in place; real layout reflow) --- */
+  /* Inserted into the timeline below the clicked play/burst; everything below is
+     translated down by this panel's height so the clock stays aligned. Never
+     absolute-positioned *over* the rows below it. */
+  .expanse{position:absolute;left:14px;right:7px;background:var(--panel);
+    border:1px solid var(--border);border-radius:13px;padding:6px 14px;z-index:8;
+    box-shadow:0 14px 36px rgba(0,0,0,.45)}
+  /* per-song row = two static cards side by side (audio | lyrics), same look as
+     the timeline blocks. Hover a row for its full diverging chart (cursor tip). */
+  .prow{padding:10px 2px;border-top:1px solid var(--border-soft)}
+  .prow:first-child{border-top:none}
+  .prow .pcards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .expanse .block{position:static;left:auto;right:auto}     /* flow, not absolute */
+  .ptag{display:flex;justify-content:center;margin-top:9px}
+  .ptag span.d{width:6px;height:6px;border-radius:50%;background:#8A6FE0;
+    display:inline-block;margin-right:6px;align-self:center}
+  .ptag{color:#cbbff0;font-size:10px;font-family:JetBrains Mono,ui-monospace,monospace}
+  .ptag .t{background:#2a2238;border:1px dashed #6f5fa6;border-radius:20px;
+    padding:3px 11px;display:inline-flex;align-items:center}
+
+  /* diverging mood chart (ported from diverging_mood_chart_mock.html) */
+  .mchart{background:var(--block);border:1px solid var(--border);border-radius:13px;
+    padding:14px 16px 16px;margin-bottom:14px}
+  .mchart .axhead{display:grid;grid-template-columns:1fr 30px 1fr;align-items:center;
+    margin-bottom:8px;overflow:hidden}
+  /* nowrap both halves so the longer "what the words said" can't wrap to a second
+     line and drop the -> arrow below the <- arrow (they must share one baseline). */
+  .mchart .axhead .a{text-align:right;font-size:9px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--muted);white-space:nowrap}
+  .mchart .axhead .l{text-align:left;font-size:9px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--muted);white-space:nowrap}
+  .mchart .axhead .a span,.mchart .axhead .l span{color:var(--faint);
+    text-transform:none;letter-spacing:0;font-size:8.5px}
+  .mchart .axhead .c{text-align:center;font-family:JetBrains Mono,ui-monospace,monospace;
+    font-size:9px;color:var(--faint)}
+  .mchart .center-wrap{position:relative}
+  .mchart .center-rule{position:absolute;left:calc(50% - 0.5px);top:0;bottom:4px;
+    width:1px;background:var(--axis);z-index:0}
+  .mchart .row{display:grid;grid-template-columns:1fr 64px 1fr;align-items:center;height:23px}
+  .mchart .side{position:relative;height:12px;background:var(--track);
+    border-radius:3px;overflow:hidden}
+  .mchart .gl{position:absolute;top:0;bottom:0;width:1px;background:#2f2940}
+  .mchart .fillL{position:absolute;right:0;top:0;bottom:0;border-radius:3px}
+  .mchart .fillR{position:absolute;left:0;top:0;bottom:0;border-radius:3px}
+  .mchart .valL{position:absolute;right:4px;top:50%;transform:translateY(-50%);
+    font-family:JetBrains Mono,ui-monospace,monospace;font-size:9px;color:#0d0b13;font-weight:500}
+  .mchart .valR{position:absolute;left:4px;top:50%;transform:translateY(-50%);
+    font-family:JetBrains Mono,ui-monospace,monospace;font-size:9px;color:#0d0b13;font-weight:500}
+  .mchart .lab{text-align:center;font-size:10.5px;color:var(--muted)}
+  .mchart .emptyR{position:absolute;left:8px;top:50%;transform:translateY(-50%);
+    font-size:9px;color:var(--faint);font-style:italic}
+  .mchart .dtag{display:inline-flex;align-items:center;gap:6px;background:#2a2238;
+    border:1px dashed #6f5fa6;color:#cbbff0;font-size:10px;padding:3px 10px;
+    border-radius:20px;font-family:JetBrains Mono,ui-monospace,monospace;margin-top:12px}
+  .mchart .dtag .d{width:6px;height:6px;border-radius:50%;background:#8A6FE0}
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">
+      <h1>Listening Diary</h1>
+      <p>The emotional shape of a day, by sound and by words.
+        <span class="sample">Live from app.db.</span></p>
+    </div>
+    <div class="daynav">
+      <button id="prev" aria-label="Previous day">&lsaquo;</button>
+      <div class="date" id="dateLabel">-<small id="dateSub"></small></div>
+      <button id="next" aria-label="Next day">&rsaquo;</button>
+    </div>
+    <div class="syncbox" id="syncbox" hidden>
+      <div class="chans">
+        <label><input type="checkbox" id="chAudio" checked> Audio</label>
+        <label><input type="checkbox" id="chLyrics"> Lyrics</label>
+      </div>
+      <button id="syncBtn">Sync now</button>
+      <span class="sstat" id="syncStat">last synced: -</span>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="rail">
+      <h2>Calendar</h2>
+      <div id="monthHost"></div>
+      <div class="note">Cell colour = the day's dominant mood. Brightness = how
+        much you listened. Click a lit day.</div>
+      <div class="legend" id="legend"><h2 style="margin-bottom:8px">Moods</h2></div>
+    </aside>
+
+    <main class="main">
+      <div class="summary">
+        <div class="ttl"><span>DAY SUMMARY</span><span id="sumMeta"></span></div>
+        <div class="sumrow"><div class="lane-tag">Audio</div><div class="spectrum" id="sumAudio"></div></div>
+        <div class="sumrow"><div class="lane-tag">Lyrics</div><div class="spectrum" id="sumLyrics"></div></div>
+      </div>
+      <h2>Day timeline <span class="hint">bar length = mood intensity &middot; click a play or burst to inspect</span></h2>
+      <div id="root"></div>
+    </main>
+  </div>
+
+  <div class="tip" id="tip"></div>
+
+<script>
+const MOODS   = ["happy", "uplifting", "energetic", "angry", "romantic", "calm", "sad", "dark"];
+const COLOR   = {"happy": "#F6C95A", "uplifting": "#F4A259", "energetic": "#EF5E6E", "angry": "#C0394F", "romantic": "#E985B0", "calm": "#57BEA9", "sad": "#5E8FD8", "dark": "#8A6FE0"};
+const CFG     = {"generated_at": "2026-06-15T03:35:05.461935+00:00", "timezone": "America/Toronto"};
+const SERVER_MODE = false;   // true only when served by `cli serve`
+// Mutable (let, not const): a Sync re-fetches /api/payload and reassigns these,
+// then re-renders in place. As a static file they're set once and never change.
+let DAYS    = {"2026-05-17": {"date": "2026-05-17", "label": "Sun, May 17", "plays": [{"id": "demo02", "t": "20:41", "name": "Glass Harbor", "artist": "Nova Quiet", "audio": {"calm": 0.88, "romantic": 0.71, "sad": 0.4, "happy": 0.3, "uplifting": 0.28, "energetic": 0.12, "dark": 0.18, "angry": 0.05}, "lyrics": {"calm": 0.74, "romantic": 0.8, "sad": 0.46, "happy": 0.33, "uplifting": 0.31, "energetic": 0.15, "dark": 0.2, "angry": 0.07}, "diverge": null}, {"id": "demo01", "t": "21:06", "name": "Paper Lanterns", "artist": "The Dead Air", "audio": {"happy": 0.91, "uplifting": 0.82, "energetic": 0.55, "calm": 0.22, "romantic": 0.3, "sad": 0.12, "dark": 0.1, "angry": 0.08}, "lyrics": {"happy": 0.14, "uplifting": 0.2, "energetic": 0.25, "calm": 0.4, "romantic": 0.35, "sad": 0.85, "dark": 0.3, "angry": 0.12}, "diverge": [{"label": "happy", "audio": 0.91, "lyric": 0.14, "delta": 0.77, "verdict": "sounds"}, {"label": "sad", "audio": 0.12, "lyric": 0.85, "delta": 0.73, "verdict": "reads"}, {"label": "uplifting", "audio": 0.82, "lyric": 0.2, "delta": 0.6199999999999999, "verdict": "sounds"}]}]}, "2026-05-18": {"date": "2026-05-18", "label": "Mon, May 18", "plays": [{"id": "demo07", "t": "08:05", "name": "Goldenrod", "artist": "The Pelican Club", "audio": {"happy": 0.89, "uplifting": 0.86, "energetic": 0.62, "romantic": 0.34, "calm": 0.3, "sad": 0.08, "dark": 0.06, "angry": 0.05}, "lyrics": {"happy": 0.82, "uplifting": 0.8, "energetic": 0.55, "romantic": 0.38, "calm": 0.33, "sad": 0.12, "dark": 0.09, "angry": 0.07}, "diverge": null}, {"id": "demo07", "t": "09:15", "name": "Goldenrod", "artist": "The Pelican Club", "audio": {"happy": 0.89, "uplifting": 0.86, "energetic": 0.62, "romantic": 0.34, "calm": 0.3, "sad": 0.08, "dark": 0.06, "angry": 0.05}, "lyrics": {"happy": 0.82, "uplifting": 0.8, "energetic": 0.55, "romantic": 0.38, "calm": 0.33, "sad": 0.12, "dark": 0.09, "angry": 0.07}, "diverge": null}]}, "2026-05-20": {"date": "2026-05-20", "label": "Wed, May 20", "plays": [{"id": "demo01", "t": "22:37", "name": "Paper Lanterns", "artist": "The Dead Air", "audio": {"happy": 0.91, "uplifting": 0.82, "energetic": 0.55, "calm": 0.22, "romantic": 0.3, "sad": 0.12, "dark": 0.1, "angry": 0.08}, "lyrics": {"happy": 0.14, "uplifting": 0.2, "energetic": 0.25, "calm": 0.4, "romantic": 0.35, "sad": 0.85, "dark": 0.3, "angry": 0.12}, "diverge": [{"label": "happy", "audio": 0.91, "lyric": 0.14, "delta": 0.77, "verdict": "sounds"}, {"label": "sad", "audio": 0.12, "lyric": 0.85, "delta": 0.73, "verdict": "reads"}, {"label": "uplifting", "audio": 0.82, "lyric": 0.2, "delta": 0.6199999999999999, "verdict": "sounds"}]}, {"id": "demo01", "t": "22:40", "name": "Paper Lanterns", "artist": "The Dead Air", "audio": {"happy": 0.91, "uplifting": 0.82, "energetic": 0.55, "calm": 0.22, "romantic": 0.3, "sad": 0.12, "dark": 0.1, "angry": 0.08}, "lyrics": {"happy": 0.14, "uplifting": 0.2, "energetic": 0.25, "calm": 0.4, "romantic": 0.35, "sad": 0.85, "dark": 0.3, "angry": 0.12}, "diverge": [{"label": "happy", "audio": 0.91, "lyric": 0.14, "delta": 0.77, "verdict": "sounds"}, {"label": "sad", "audio": 0.12, "lyric": 0.85, "delta": 0.73, "verdict": "reads"}, {"label": "uplifting", "audio": 0.82, "lyric": 0.2, "delta": 0.6199999999999999, "verdict": "sounds"}]}]}, "2026-05-21": {"date": "2026-05-21", "label": "Thu, May 21", "plays": [{"id": "demo05", "t": "21:54", "name": "Midnight Arcade", "artist": "Tessellate", "audio": {"energetic": 0.78, "dark": 0.62, "uplifting": 0.55, "happy": 0.4, "calm": 0.2, "romantic": 0.22, "sad": 0.18, "angry": 0.24}, "lyrics": {}, "diverge": null}]}, "2026-05-22": {"date": "2026-05-22", "label": "Fri, May 22", "plays": [{"id": "demo03", "t": "09:36", "name": "Cobalt Engine", "artist": "Hartt & Vale", "audio": {"energetic": 0.93, "happy": 0.66, "uplifting": 0.7, "angry": 0.35, "dark": 0.25, "romantic": 0.18, "calm": 0.08, "sad": 0.1}, "lyrics": {"energetic": 0.8, "happy": 0.58, "uplifting": 0.62, "angry": 0.3, "dark": 0.22, "romantic": 0.2, "calm": 0.12, "sad": 0.14}, "diverge": null}, {"id": "demo04", "t": "09:37", "name": "Hollow Static", "artist": "Mara Lune", "audio": {"dark": 0.9, "angry": 0.74, "energetic": 0.58, "sad": 0.44, "happy": 0.1, "uplifting": 0.12, "calm": 0.14, "romantic": 0.16}, "lyrics": {"dark": 0.28, "angry": 0.2, "energetic": 0.3, "sad": 0.4, "happy": 0.3, "uplifting": 0.34, "calm": 0.46, "romantic": 0.78}, "diverge": [{"label": "dark", "audio": 0.9, "lyric": 0.28, "delta": 0.62, "verdict": "sounds"}, {"label": "romantic", "audio": 0.16, "lyric": 0.78, "delta": 0.62, "verdict": "reads"}, {"label": "angry", "audio": 0.74, "lyric": 0.2, "delta": 0.54, "verdict": "sounds"}]}, {"id": "demo02", "t": "19:06", "name": "Glass Harbor", "artist": "Nova Quiet", "audio": {"calm": 0.88, "romantic": 0.71, "sad": 0.4, "happy": 0.3, "uplifting": 0.28, "energetic": 0.12, "dark": 0.18, "angry": 0.05}, "lyrics": {"calm": 0.74, "romantic": 0.8, "sad": 0.46, "happy": 0.33, "uplifting": 0.31, "energetic": 0.15, "dark": 0.2, "angry": 0.07}, "diverge": null}]}, "2026-05-23": {"date": "2026-05-23", "label": "Sat, May 23", "plays": [{"id": "demo07", "t": "13:31", "name": "Goldenrod", "artist": "The Pelican Club", "audio": {"happy": 0.89, "uplifting": 0.86, "energetic": 0.62, "romantic": 0.34, "calm": 0.3, "sad": 0.08, "dark": 0.06, "angry": 0.05}, "lyrics": {"happy": 0.82, "uplifting": 0.8, "energetic": 0.55, "romantic": 0.38, "calm": 0.33, "sad": 0.12, "dark": 0.09, "angry": 0.07}, "diverge": null}, {"id": "demo03", "t": "19:19", "name": "Cobalt Engine", "artist": "Hartt & Vale", "audio": {"energetic": 0.93, "happy": 0.66, "uplifting": 0.7, "angry": 0.35, "dark": 0.25, "romantic": 0.18, "calm": 0.08, "sad": 0.1}, "lyrics": {"energetic": 0.8, "happy": 0.58, "uplifting": 0.62, "angry": 0.3, "dark": 0.22, "romantic": 0.2, "calm": 0.12, "sad": 0.14}, "diverge": null}, {"id": "demo08", "t": "19:29", "name": "Concrete Roses", "artist": "Vell Mercer", "audio": {"calm": 0.8, "romantic": 0.58, "sad": 0.4, "happy": 0.34, "uplifting": 0.3, "energetic": 0.18, "dark": 0.22, "angry": 0.14}, "lyrics": {"calm": 0.26, "romantic": 0.3, "sad": 0.44, "happy": 0.2, "uplifting": 0.28, "energetic": 0.4, "dark": 0.5, "angry": 0.84}, "diverge": [{"label": "angry", "audio": 0.14, "lyric": 0.84, "delta": 0.7, "verdict": "reads"}, {"label": "calm", "audio": 0.8, "lyric": 0.26, "delta": 0.54, "verdict": "sounds"}]}]}, "2026-05-24": {"date": "2026-05-24", "label": "Sun, May 24", "plays": [{"id": "demo08", "t": "09:36", "name": "Concrete Roses", "artist": "Vell Mercer", "audio": {"calm": 0.8, "romantic": 0.58, "sad": 0.4, "happy": 0.34, "uplifting": 0.3, "energetic": 0.18, "dark": 0.22, "angry": 0.14}, "lyrics": {"calm": 0.26, "romantic": 0.3, "sad": 0.44, "happy": 0.2, "uplifting": 0.28, "energetic": 0.4, "dark": 0.5, "angry": 0.84}, "diverge": [{"label": "angry", "audio": 0.14, "lyric": 0.84, "delta": 0.7, "verdict": "reads"}, {"label": "calm", "audio": 0.8, "lyric": 0.26, "delta": 0.54, "verdict": "sounds"}]}, {"id": "demo05", "t": "19:46", "name": "Midnight Arcade", "artist": "Tessellate", "audio": {"energetic": 0.78, "dark": 0.62, "uplifting": 0.55, "happy": 0.4, "calm": 0.2, "romantic": 0.22, "sad": 0.18, "angry": 0.24}, "lyrics": {}, "diverge": null}]}, "2026-05-25": {"date": "2026-05-25", "label": "Mon, May 25", "plays": [{"id": "demo03", "t": "09:32", "name": "Cobalt Engine", "artist": "Hartt & Vale", "audio": {"energetic": 0.93, "happy": 0.66, "uplifting": 0.7, "angry": 0.35, "dark": 0.25, "romantic": 0.18, "calm": 0.08, "sad": 0.1}, "lyrics": {"energetic": 0.8, "happy": 0.58, "uplifting": 0.62, "angry": 0.3, "dark": 0.22, "romantic": 0.2, "calm": 0.12, "sad": 0.14}, "diverge": null}]}, "2026-05-26": {"date": "2026-05-26", "label": "Tue, May 26", "plays": [{"id": "demo02", "t": "21:26", "name": "Glass Harbor", "artist": "Nova Quiet", "audio": {"calm": 0.88, "romantic": 0.71, "sad": 0.4, "happy": 0.3, "uplifting": 0.28, "energetic": 0.12, "dark": 0.18, "angry": 0.05}, "lyrics": {"calm": 0.74, "romantic": 0.8, "sad": 0.46, "happy": 0.33, "uplifting": 0.31, "energetic": 0.15, "dark": 0.2, "angry": 0.07}, "diverge": null}, {"id": "demo06", "t": "21:36", "name": "Saltwater Hymn", "artist": "Orla Finch", "audio": {"sad": 0.84, "calm": 0.7, "romantic": 0.42, "dark": 0.36, "happy": 0.14, "uplifting": 0.18, "energetic": 0.1, "angry": 0.06}, "lyrics": {"sad": 0.88, "calm": 0.55, "romantic": 0.4, "dark": 0.3, "happy": 0.16, "uplifting": 0.22, "energetic": 0.12, "angry": 0.08}, "diverge": null}]}, "2026-05-27": {"date": "2026-05-27", "label": "Wed, May 27", "plays": [{"id": "demo05", "t": "09:53", "name": "Midnight Arcade", "artist": "Tessellate", "audio": {"energetic": 0.78, "dark": 0.62, "uplifting": 0.55, "happy": 0.4, "calm": 0.2, "romantic": 0.22, "sad": 0.18, "angry": 0.24}, "lyrics": {}, "diverge": null}, {"id": "demo08", "t": "22:31", "name": "Concrete Roses", "artist": "Vell Mercer", "audio": {"calm": 0.8, "romantic": 0.58, "sad": 0.4, "happy": 0.34, "uplifting": 0.3, "energetic": 0.18, "dark": 0.22, "angry": 0.14}, "lyrics": {"calm": 0.26, "romantic": 0.3, "sad": 0.44, "happy": 0.2, "uplifting": 0.28, "energetic": 0.4, "dark": 0.5, "angry": 0.84}, "diverge": [{"label": "angry", "audio": 0.14, "lyric": 0.84, "delta": 0.7, "verdict": "reads"}, {"label": "calm", "audio": 0.8, "lyric": 0.26, "delta": 0.54, "verdict": "sounds"}]}]}, "2026-05-28": {"date": "2026-05-28", "label": "Thu, May 28", "plays": [{"id": "demo03", "t": "08:29", "name": "Cobalt Engine", "artist": "Hartt & Vale", "audio": {"energetic": 0.93, "happy": 0.66, "uplifting": 0.7, "angry": 0.35, "dark": 0.25, "romantic": 0.18, "calm": 0.08, "sad": 0.1}, "lyrics": {"energetic": 0.8, "happy": 0.58, "uplifting": 0.62, "angry": 0.3, "dark": 0.22, "romantic": 0.2, "calm": 0.12, "sad": 0.14}, "diverge": null}, {"id": "demo05", "t": "09:03", "name": "Midnight Arcade", "artist": "Tessellate", "audio": {"energetic": 0.78, "dark": 0.62, "uplifting": 0.55, "happy": 0.4, "calm": 0.2, "romantic": 0.22, "sad": 0.18, "angry": 0.24}, "lyrics": {}, "diverge": null}, {"id": "demo06", "t": "18:45", "name": "Saltwater Hymn", "artist": "Orla Finch", "audio": {"sad": 0.84, "calm": 0.7, "romantic": 0.42, "dark": 0.36, "happy": 0.14, "uplifting": 0.18, "energetic": 0.1, "angry": 0.06}, "lyrics": {"sad": 0.88, "calm": 0.55, "romantic": 0.4, "dark": 0.3, "happy": 0.16, "uplifting": 0.22, "energetic": 0.12, "angry": 0.08}, "diverge": null}, {"id": "demo08", "t": "22:36", "name": "Concrete Roses", "artist": "Vell Mercer", "audio": {"calm": 0.8, "romantic": 0.58, "sad": 0.4, "happy": 0.34, "uplifting": 0.3, "energetic": 0.18, "dark": 0.22, "angry": 0.14}, "lyrics": {"calm": 0.26, "romantic": 0.3, "sad": 0.44, "happy": 0.2, "uplifting": 0.28, "energetic": 0.4, "dark": 0.5, "angry": 0.84}, "diverge": [{"label": "angry", "audio": 0.14, "lyric": 0.84, "delta": 0.7, "verdict": "reads"}, {"label": "calm", "audio": 0.8, "lyric": 0.26, "delta": 0.54, "verdict": "sounds"}]}]}, "2026-05-29": {"date": "2026-05-29", "label": "Fri, May 29", "plays": [{"id": "demo05", "t": "08:13", "name": "Midnight Arcade", "artist": "Tessellate", "audio": {"energetic": 0.78, "dark": 0.62, "uplifting": 0.55, "happy": 0.4, "calm": 0.2, "romantic": 0.22, "sad": 0.18, "angry": 0.24}, "lyrics": {}, "diverge": null}, {"id": "demo07", "t": "12:47", "name": "Goldenrod", "artist": "The Pelican Club", "audio": {"happy": 0.89, "uplifting": 0.86, "energetic": 0.62, "romantic": 0.34, "calm": 0.3, "sad": 0.08, "dark": 0.06, "angry": 0.05}, "lyrics": {"happy": 0.82, "uplifting": 0.8, "energetic": 0.55, "romantic": 0.38, "calm": 0.33, "sad": 0.12, "dark": 0.09, "angry": 0.07}, "diverge": null}, {"id": "demo08", "t": "20:58", "name": "Concrete Roses", "artist": "Vell Mercer", "audio": {"calm": 0.8, "romantic": 0.58, "sad": 0.4, "happy": 0.34, "uplifting": 0.3, "energetic": 0.18, "dark": 0.22, "angry": 0.14}, "lyrics": {"calm": 0.26, "romantic": 0.3, "sad": 0.44, "happy": 0.2, "uplifting": 0.28, "energetic": 0.4, "dark": 0.5, "angry": 0.84}, "diverge": [{"label": "angry", "audio": 0.14, "lyric": 0.84, "delta": 0.7, "verdict": "reads"}, {"label": "calm", "audio": 0.8, "lyric": 0.26, "delta": 0.54, "verdict": "sounds"}]}]}, "2026-05-31": {"date": "2026-05-31", "label": "Sun, May 31", "plays": [{"id": "demo07", "t": "18:56", "name": "Goldenrod", "artist": "The Pelican Club", "audio": {"happy": 0.89, "uplifting": 0.86, "energetic": 0.62, "romantic": 0.34, "calm": 0.3, "sad": 0.08, "dark": 0.06, "angry": 0.05}, "lyrics": {"happy": 0.82, "uplifting": 0.8, "energetic": 0.55, "romantic": 0.38, "calm": 0.33, "sad": 0.12, "dark": 0.09, "angry": 0.07}, "diverge": null}, {"id": "demo07", "t": "19:43", "name": "Goldenrod", "artist": "The Pelican Club", "audio": {"happy": 0.89, "uplifting": 0.86, "energetic": 0.62, "romantic": 0.34, "calm": 0.3, "sad": 0.08, "dark": 0.06, "angry": 0.05}, "lyrics": {"happy": 0.82, "uplifting": 0.8, "energetic": 0.55, "romantic": 0.38, "calm": 0.33, "sad": 0.12, "dark": 0.09, "angry": 0.07}, "diverge": null}, {"id": "demo07", "t": "21:17", "name": "Goldenrod", "artist": "The Pelican Club", "audio": {"happy": 0.89, "uplifting": 0.86, "energetic": 0.62, "romantic": 0.34, "calm": 0.3, "sad": 0.08, "dark": 0.06, "angry": 0.05}, "lyrics": {"happy": 0.82, "uplifting": 0.8, "energetic": 0.55, "romantic": 0.38, "calm": 0.33, "sad": 0.12, "dark": 0.09, "angry": 0.07}, "diverge": null}]}, "2026-06-01": {"date": "2026-06-01", "label": "Mon, Jun 1", "plays": [{"id": "demo04", "t": "09:11", "name": "Hollow Static", "artist": "Mara Lune", "audio": {"dark": 0.9, "angry": 0.74, "energetic": 0.58, "sad": 0.44, "happy": 0.1, "uplifting": 0.12, "calm": 0.14, "romantic": 0.16}, "lyrics": {"dark": 0.28, "angry": 0.2, "energetic": 0.3, "sad": 0.4, "happy": 0.3, "uplifting": 0.34, "calm": 0.46, "romantic": 0.78}, "diverge": [{"label": "dark", "audio": 0.9, "lyric": 0.28, "delta": 0.62, "verdict": "sounds"}, {"label": "romantic", "audio": 0.16, "lyric": 0.78, "delta": 0.62, "verdict": "reads"}, {"label": "angry", "audio": 0.74, "lyric": 0.2, "delta": 0.54, "verdict": "sounds"}]}, {"id": "demo08", "t": "22:14", "name": "Concrete Roses", "artist": "Vell Mercer", "audio": {"calm": 0.8, "romantic": 0.58, "sad": 0.4, "happy": 0.34, "uplifting": 0.3, "energetic": 0.18, "dark": 0.22, "angry": 0.14}, "lyrics": {"calm": 0.26, "romantic": 0.3, "sad": 0.44, "happy": 0.2, "uplifting": 0.28, "energetic": 0.4, "dark": 0.5, "angry": 0.84}, "diverge": [{"label": "angry", "audio": 0.14, "lyric": 0.84, "delta": 0.7, "verdict": "reads"}, {"label": "calm", "audio": 0.8, "lyric": 0.26, "delta": 0.54, "verdict": "sounds"}]}]}, "2026-06-02": {"date": "2026-06-02", "label": "Tue, Jun 2", "plays": [{"id": "demo03", "t": "18:18", "name": "Cobalt Engine", "artist": "Hartt & Vale", "audio": {"energetic": 0.93, "happy": 0.66, "uplifting": 0.7, "angry": 0.35, "dark": 0.25, "romantic": 0.18, "calm": 0.08, "sad": 0.1}, "lyrics": {"energetic": 0.8, "happy": 0.58, "uplifting": 0.62, "angry": 0.3, "dark": 0.22, "romantic": 0.2, "calm": 0.12, "sad": 0.14}, "diverge": null}, {"id": "demo06", "t": "20:34", "name": "Saltwater Hymn", "artist": "Orla Finch", "audio": {"sad": 0.84, "calm": 0.7, "romantic": 0.42, "dark": 0.36, "happy": 0.14, "uplifting": 0.18, "energetic": 0.1, "angry": 0.06}, "lyrics": {"sad": 0.88, "calm": 0.55, "romantic": 0.4, "dark": 0.3, "happy": 0.16, "uplifting": 0.22, "energetic": 0.12, "angry": 0.08}, "diverge": null}]}, "2026-06-03": {"date": "2026-06-03", "label": "Wed, Jun 3", "plays": [{"id": "demo02", "t": "20:25", "name": "Glass Harbor", "artist": "Nova Quiet", "audio": {"calm": 0.88, "romantic": 0.71, "sad": 0.4, "happy": 0.3, "uplifting": 0.28, "energetic": 0.12, "dark": 0.18, "angry": 0.05}, "lyrics": {"calm": 0.74, "romantic": 0.8, "sad": 0.46, "happy": 0.33, "uplifting": 0.31, "energetic": 0.15, "dark": 0.2, "angry": 0.07}, "diverge": null}, {"id": "demo01", "t": "21:39", "name": "Paper Lanterns", "artist": "The Dead Air", "audio": {"happy": 0.91, "uplifting": 0.82, "energetic": 0.55, "calm": 0.22, "romantic": 0.3, "sad": 0.12, "dark": 0.1, "angry": 0.08}, "lyrics": {"happy": 0.14, "uplifting": 0.2, "energetic": 0.25, "calm": 0.4, "romantic": 0.35, "sad": 0.85, "dark": 0.3, "angry": 0.12}, "diverge": [{"label": "happy", "audio": 0.91, "lyric": 0.14, "delta": 0.77, "verdict": "sounds"}, {"label": "sad", "audio": 0.12, "lyric": 0.85, "delta": 0.73, "verdict": "reads"}, {"label": "uplifting", "audio": 0.82, "lyric": 0.2, "delta": 0.6199999999999999, "verdict": "sounds"}]}, {"id": "demo01", "t": "21:40", "name": "Paper Lanterns", "artist": "The Dead Air", "audio": {"happy": 0.91, "uplifting": 0.82, "energetic": 0.55, "calm": 0.22, "romantic": 0.3, "sad": 0.12, "dark": 0.1, "angry": 0.08}, "lyrics": {"happy": 0.14, "uplifting": 0.2, "energetic": 0.25, "calm": 0.4, "romantic": 0.35, "sad": 0.85, "dark": 0.3, "angry": 0.12}, "diverge": [{"label": "happy", "audio": 0.91, "lyric": 0.14, "delta": 0.77, "verdict": "sounds"}, {"label": "sad", "audio": 0.12, "lyric": 0.85, "delta": 0.73, "verdict": "reads"}, {"label": "uplifting", "audio": 0.82, "lyric": 0.2, "delta": 0.6199999999999999, "verdict": "sounds"}]}, {"id": "demo07", "t": "21:57", "name": "Goldenrod", "artist": "The Pelican Club", "audio": {"happy": 0.89, "uplifting": 0.86, "energetic": 0.62, "romantic": 0.34, "calm": 0.3, "sad": 0.08, "dark": 0.06, "angry": 0.05}, "lyrics": {"happy": 0.82, "uplifting": 0.8, "energetic": 0.55, "romantic": 0.38, "calm": 0.33, "sad": 0.12, "dark": 0.09, "angry": 0.07}, "diverge": null}]}, "2026-06-04": {"date": "2026-06-04", "label": "Thu, Jun 4", "plays": [{"id": "demo06", "t": "21:10", "name": "Saltwater Hymn", "artist": "Orla Finch", "audio": {"sad": 0.84, "calm": 0.7, "romantic": 0.42, "dark": 0.36, "happy": 0.14, "uplifting": 0.18, "energetic": 0.1, "angry": 0.06}, "lyrics": {"sad": 0.88, "calm": 0.55, "romantic": 0.4, "dark": 0.3, "happy": 0.16, "uplifting": 0.22, "energetic": 0.12, "angry": 0.08}, "diverge": null}, {"id": "demo01", "t": "22:03", "name": "Paper Lanterns", "artist": "The Dead Air", "audio": {"happy": 0.91, "uplifting": 0.82, "energetic": 0.55, "calm": 0.22, "romantic": 0.3, "sad": 0.12, "dark": 0.1, "angry": 0.08}, "lyrics": {"happy": 0.14, "uplifting": 0.2, "energetic": 0.25, "calm": 0.4, "romantic": 0.35, "sad": 0.85, "dark": 0.3, "angry": 0.12}, "diverge": [{"label": "happy", "audio": 0.91, "lyric": 0.14, "delta": 0.77, "verdict": "sounds"}, {"label": "sad", "audio": 0.12, "lyric": 0.85, "delta": 0.73, "verdict": "reads"}, {"label": "uplifting", "audio": 0.82, "lyric": 0.2, "delta": 0.6199999999999999, "verdict": "sounds"}]}]}, "2026-06-05": {"date": "2026-06-05", "label": "Fri, Jun 5", "plays": [{"id": "demo01", "t": "09:23", "name": "Paper Lanterns", "artist": "The Dead Air", "audio": {"happy": 0.91, "uplifting": 0.82, "energetic": 0.55, "calm": 0.22, "romantic": 0.3, "sad": 0.12, "dark": 0.1, "angry": 0.08}, "lyrics": {"happy": 0.14, "uplifting": 0.2, "energetic": 0.25, "calm": 0.4, "romantic": 0.35, "sad": 0.85, "dark": 0.3, "angry": 0.12}, "diverge": [{"label": "happy", "audio": 0.91, "lyric": 0.14, "delta": 0.77, "verdict": "sounds"}, {"label": "sad", "audio": 0.12, "lyric": 0.85, "delta": 0.73, "verdict": "reads"}, {"label": "uplifting", "audio": 0.82, "lyric": 0.2, "delta": 0.6199999999999999, "verdict": "sounds"}]}, {"id": "demo07", "t": "09:55", "name": "Goldenrod", "artist": "The Pelican Club", "audio": {"happy": 0.89, "uplifting": 0.86, "energetic": 0.62, "romantic": 0.34, "calm": 0.3, "sad": 0.08, "dark": 0.06, "angry": 0.05}, "lyrics": {"happy": 0.82, "uplifting": 0.8, "energetic": 0.55, "romantic": 0.38, "calm": 0.33, "sad": 0.12, "dark": 0.09, "angry": 0.07}, "diverge": null}, {"id": "demo06", "t": "12:40", "name": "Saltwater Hymn", "artist": "Orla Finch", "audio": {"sad": 0.84, "calm": 0.7, "romantic": 0.42, "dark": 0.36, "happy": 0.14, "uplifting": 0.18, "energetic": 0.1, "angry": 0.06}, "lyrics": {"sad": 0.88, "calm": 0.55, "romantic": 0.4, "dark": 0.3, "happy": 0.16, "uplifting": 0.22, "energetic": 0.12, "angry": 0.08}, "diverge": null}]}, "2026-06-06": {"date": "2026-06-06", "label": "Sat, Jun 6", "plays": [{"id": "demo08", "t": "09:07", "name": "Concrete Roses", "artist": "Vell Mercer", "audio": {"calm": 0.8, "romantic": 0.58, "sad": 0.4, "happy": 0.34, "uplifting": 0.3, "energetic": 0.18, "dark": 0.22, "angry": 0.14}, "lyrics": {"calm": 0.26, "romantic": 0.3, "sad": 0.44, "happy": 0.2, "uplifting": 0.28, "energetic": 0.4, "dark": 0.5, "angry": 0.84}, "diverge": [{"label": "angry", "audio": 0.14, "lyric": 0.84, "delta": 0.7, "verdict": "reads"}, {"label": "calm", "audio": 0.8, "lyric": 0.26, "delta": 0.54, "verdict": "sounds"}]}, {"id": "demo06", "t": "09:09", "name": "Saltwater Hymn", "artist": "Orla Finch", "audio": {"sad": 0.84, "calm": 0.7, "romantic": 0.42, "dark": 0.36, "happy": 0.14, "uplifting": 0.18, "energetic": 0.1, "angry": 0.06}, "lyrics": {"sad": 0.88, "calm": 0.55, "romantic": 0.4, "dark": 0.3, "happy": 0.16, "uplifting": 0.22, "energetic": 0.12, "angry": 0.08}, "diverge": null}, {"id": "demo05", "t": "21:30", "name": "Midnight Arcade", "artist": "Tessellate", "audio": {"energetic": 0.78, "dark": 0.62, "uplifting": 0.55, "happy": 0.4, "calm": 0.2, "romantic": 0.22, "sad": 0.18, "angry": 0.24}, "lyrics": {}, "diverge": null}]}, "2026-06-07": {"date": "2026-06-07", "label": "Sun, Jun 7", "plays": [{"id": "demo03", "t": "13:33", "name": "Cobalt Engine", "artist": "Hartt & Vale", "audio": {"energetic": 0.93, "happy": 0.66, "uplifting": 0.7, "angry": 0.35, "dark": 0.25, "romantic": 0.18, "calm": 0.08, "sad": 0.1}, "lyrics": {"energetic": 0.8, "happy": 0.58, "uplifting": 0.62, "angry": 0.3, "dark": 0.22, "romantic": 0.2, "calm": 0.12, "sad": 0.14}, "diverge": null}, {"id": "demo01", "t": "23:10", "name": "Paper Lanterns", "artist": "The Dead Air", "audio": {"happy": 0.91, "uplifting": 0.82, "energetic": 0.55, "calm": 0.22, "romantic": 0.3, "sad": 0.12, "dark": 0.1, "angry": 0.08}, "lyrics": {"happy": 0.14, "uplifting": 0.2, "energetic": 0.25, "calm": 0.4, "romantic": 0.35, "sad": 0.85, "dark": 0.3, "angry": 0.12}, "diverge": [{"label": "happy", "audio": 0.91, "lyric": 0.14, "delta": 0.77, "verdict": "sounds"}, {"label": "sad", "audio": 0.12, "lyric": 0.85, "delta": 0.73, "verdict": "reads"}, {"label": "uplifting", "audio": 0.82, "lyric": 0.2, "delta": 0.6199999999999999, "verdict": "sounds"}]}, {"id": "demo01", "t": "23:34", "name": "Paper Lanterns", "artist": "The Dead Air", "audio": {"happy": 0.91, "uplifting": 0.82, "energetic": 0.55, "calm": 0.22, "romantic": 0.3, "sad": 0.12, "dark": 0.1, "angry": 0.08}, "lyrics": {"happy": 0.14, "uplifting": 0.2, "energetic": 0.25, "calm": 0.4, "romantic": 0.35, "sad": 0.85, "dark": 0.3, "angry": 0.12}, "diverge": [{"label": "happy", "audio": 0.91, "lyric": 0.14, "delta": 0.77, "verdict": "sounds"}, {"label": "sad", "audio": 0.12, "lyric": 0.85, "delta": 0.73, "verdict": "reads"}, {"label": "uplifting", "audio": 0.82, "lyric": 0.2, "delta": 0.6199999999999999, "verdict": "sounds"}]}]}, "2026-06-08": {"date": "2026-06-08", "label": "Mon, Jun 8", "plays": [{"id": "demo03", "t": "21:23", "name": "Cobalt Engine", "artist": "Hartt & Vale", "audio": {"energetic": 0.93, "happy": 0.66, "uplifting": 0.7, "angry": 0.35, "dark": 0.25, "romantic": 0.18, "calm": 0.08, "sad": 0.1}, "lyrics": {"energetic": 0.8, "happy": 0.58, "uplifting": 0.62, "angry": 0.3, "dark": 0.22, "romantic": 0.2, "calm": 0.12, "sad": 0.14}, "diverge": null}, {"id": "demo05", "t": "22:55", "name": "Midnight Arcade", "artist": "Tessellate", "audio": {"energetic": 0.78, "dark": 0.62, "uplifting": 0.55, "happy": 0.4, "calm": 0.2, "romantic": 0.22, "sad": 0.18, "angry": 0.24}, "lyrics": {}, "diverge": null}]}, "2026-06-09": {"date": "2026-06-09", "label": "Tue, Jun 9", "plays": [{"id": "demo06", "t": "21:34", "name": "Saltwater Hymn", "artist": "Orla Finch", "audio": {"sad": 0.84, "calm": 0.7, "romantic": 0.42, "dark": 0.36, "happy": 0.14, "uplifting": 0.18, "energetic": 0.1, "angry": 0.06}, "lyrics": {"sad": 0.88, "calm": 0.55, "romantic": 0.4, "dark": 0.3, "happy": 0.16, "uplifting": 0.22, "energetic": 0.12, "angry": 0.08}, "diverge": null}, {"id": "demo04", "t": "22:14", "name": "Hollow Static", "artist": "Mara Lune", "audio": {"dark": 0.9, "angry": 0.74, "energetic": 0.58, "sad": 0.44, "happy": 0.1, "uplifting": 0.12, "calm": 0.14, "romantic": 0.16}, "lyrics": {"dark": 0.28, "angry": 0.2, "energetic": 0.3, "sad": 0.4, "happy": 0.3, "uplifting": 0.34, "calm": 0.46, "romantic": 0.78}, "diverge": [{"label": "dark", "audio": 0.9, "lyric": 0.28, "delta": 0.62, "verdict": "sounds"}, {"label": "romantic", "audio": 0.16, "lyric": 0.78, "delta": 0.62, "verdict": "reads"}, {"label": "angry", "audio": 0.74, "lyric": 0.2, "delta": 0.54, "verdict": "sounds"}]}]}, "2026-06-10": {"date": "2026-06-10", "label": "Wed, Jun 10", "plays": [{"id": "demo06", "t": "13:33", "name": "Saltwater Hymn", "artist": "Orla Finch", "audio": {"sad": 0.84, "calm": 0.7, "romantic": 0.42, "dark": 0.36, "happy": 0.14, "uplifting": 0.18, "energetic": 0.1, "angry": 0.06}, "lyrics": {"sad": 0.88, "calm": 0.55, "romantic": 0.4, "dark": 0.3, "happy": 0.16, "uplifting": 0.22, "energetic": 0.12, "angry": 0.08}, "diverge": null}, {"id": "demo04", "t": "20:47", "name": "Hollow Static", "artist": "Mara Lune", "audio": {"dark": 0.9, "angry": 0.74, "energetic": 0.58, "sad": 0.44, "happy": 0.1, "uplifting": 0.12, "calm": 0.14, "romantic": 0.16}, "lyrics": {"dark": 0.28, "angry": 0.2, "energetic": 0.3, "sad": 0.4, "happy": 0.3, "uplifting": 0.34, "calm": 0.46, "romantic": 0.78}, "diverge": [{"label": "dark", "audio": 0.9, "lyric": 0.28, "delta": 0.62, "verdict": "sounds"}, {"label": "romantic", "audio": 0.16, "lyric": 0.78, "delta": 0.62, "verdict": "reads"}, {"label": "angry", "audio": 0.74, "lyric": 0.2, "delta": 0.54, "verdict": "sounds"}]}, {"id": "demo06", "t": "21:16", "name": "Saltwater Hymn", "artist": "Orla Finch", "audio": {"sad": 0.84, "calm": 0.7, "romantic": 0.42, "dark": 0.36, "happy": 0.14, "uplifting": 0.18, "energetic": 0.1, "angry": 0.06}, "lyrics": {"sad": 0.88, "calm": 0.55, "romantic": 0.4, "dark": 0.3, "happy": 0.16, "uplifting": 0.22, "energetic": 0.12, "angry": 0.08}, "diverge": null}, {"id": "demo06", "t": "21:51", "name": "Saltwater Hymn", "artist": "Orla Finch", "audio": {"sad": 0.84, "calm": 0.7, "romantic": 0.42, "dark": 0.36, "happy": 0.14, "uplifting": 0.18, "energetic": 0.1, "angry": 0.06}, "lyrics": {"sad": 0.88, "calm": 0.55, "romantic": 0.4, "dark": 0.3, "happy": 0.16, "uplifting": 0.22, "energetic": 0.12, "angry": 0.08}, "diverge": null}, {"id": "demo05", "t": "23:01", "name": "Midnight Arcade", "artist": "Tessellate", "audio": {"energetic": 0.78, "dark": 0.62, "uplifting": 0.55, "happy": 0.4, "calm": 0.2, "romantic": 0.22, "sad": 0.18, "angry": 0.24}, "lyrics": {}, "diverge": null}]}, "2026-06-11": {"date": "2026-06-11", "label": "Thu, Jun 11", "plays": [{"id": "demo04", "t": "09:14", "name": "Hollow Static", "artist": "Mara Lune", "audio": {"dark": 0.9, "angry": 0.74, "energetic": 0.58, "sad": 0.44, "happy": 0.1, "uplifting": 0.12, "calm": 0.14, "romantic": 0.16}, "lyrics": {"dark": 0.28, "angry": 0.2, "energetic": 0.3, "sad": 0.4, "happy": 0.3, "uplifting": 0.34, "calm": 0.46, "romantic": 0.78}, "diverge": [{"label": "dark", "audio": 0.9, "lyric": 0.28, "delta": 0.62, "verdict": "sounds"}, {"label": "romantic", "audio": 0.16, "lyric": 0.78, "delta": 0.62, "verdict": "reads"}, {"label": "angry", "audio": 0.74, "lyric": 0.2, "delta": 0.54, "verdict": "sounds"}]}, {"id": "demo04", "t": "21:12", "name": "Hollow Static", "artist": "Mara Lune", "audio": {"dark": 0.9, "angry": 0.74, "energetic": 0.58, "sad": 0.44, "happy": 0.1, "uplifting": 0.12, "calm": 0.14, "romantic": 0.16}, "lyrics": {"dark": 0.28, "angry": 0.2, "energetic": 0.3, "sad": 0.4, "happy": 0.3, "uplifting": 0.34, "calm": 0.46, "romantic": 0.78}, "diverge": [{"label": "dark", "audio": 0.9, "lyric": 0.28, "delta": 0.62, "verdict": "sounds"}, {"label": "romantic", "audio": 0.16, "lyric": 0.78, "delta": 0.62, "verdict": "reads"}, {"label": "angry", "audio": 0.74, "lyric": 0.2, "delta": 0.54, "verdict": "sounds"}]}]}, "2026-06-12": {"date": "2026-06-12", "label": "Fri, Jun 12", "plays": [{"id": "demo06", "t": "08:30", "name": "Saltwater Hymn", "artist": "Orla Finch", "audio": {"sad": 0.84, "calm": 0.7, "romantic": 0.42, "dark": 0.36, "happy": 0.14, "uplifting": 0.18, "energetic": 0.1, "angry": 0.06}, "lyrics": {"sad": 0.88, "calm": 0.55, "romantic": 0.4, "dark": 0.3, "happy": 0.16, "uplifting": 0.22, "energetic": 0.12, "angry": 0.08}, "diverge": null}, {"id": "demo04", "t": "20:50", "name": "Hollow Static", "artist": "Mara Lune", "audio": {"dark": 0.9, "angry": 0.74, "energetic": 0.58, "sad": 0.44, "happy": 0.1, "uplifting": 0.12, "calm": 0.14, "romantic": 0.16}, "lyrics": {"dark": 0.28, "angry": 0.2, "energetic": 0.3, "sad": 0.4, "happy": 0.3, "uplifting": 0.34, "calm": 0.46, "romantic": 0.78}, "diverge": [{"label": "dark", "audio": 0.9, "lyric": 0.28, "delta": 0.62, "verdict": "sounds"}, {"label": "romantic", "audio": 0.16, "lyric": 0.78, "delta": 0.62, "verdict": "reads"}, {"label": "angry", "audio": 0.74, "lyric": 0.2, "delta": 0.54, "verdict": "sounds"}]}, {"id": "demo02", "t": "22:05", "name": "Glass Harbor", "artist": "Nova Quiet", "audio": {"calm": 0.88, "romantic": 0.71, "sad": 0.4, "happy": 0.3, "uplifting": 0.28, "energetic": 0.12, "dark": 0.18, "angry": 0.05}, "lyrics": {"calm": 0.74, "romantic": 0.8, "sad": 0.46, "happy": 0.33, "uplifting": 0.31, "energetic": 0.15, "dark": 0.2, "angry": 0.07}, "diverge": null}]}, "2026-06-13": {"date": "2026-06-13", "label": "Sat, Jun 13", "plays": [{"id": "demo07", "t": "09:51", "name": "Goldenrod", "artist": "The Pelican Club", "audio": {"happy": 0.89, "uplifting": 0.86, "energetic": 0.62, "romantic": 0.34, "calm": 0.3, "sad": 0.08, "dark": 0.06, "angry": 0.05}, "lyrics": {"happy": 0.82, "uplifting": 0.8, "energetic": 0.55, "romantic": 0.38, "calm": 0.33, "sad": 0.12, "dark": 0.09, "angry": 0.07}, "diverge": null}, {"id": "demo06", "t": "20:50", "name": "Saltwater Hymn", "artist": "Orla Finch", "audio": {"sad": 0.84, "calm": 0.7, "romantic": 0.42, "dark": 0.36, "happy": 0.14, "uplifting": 0.18, "energetic": 0.1, "angry": 0.06}, "lyrics": {"sad": 0.88, "calm": 0.55, "romantic": 0.4, "dark": 0.3, "happy": 0.16, "uplifting": 0.22, "energetic": 0.12, "angry": 0.08}, "diverge": null}, {"id": "demo01", "t": "22:10", "name": "Paper Lanterns", "artist": "The Dead Air", "audio": {"happy": 0.91, "uplifting": 0.82, "energetic": 0.55, "calm": 0.22, "romantic": 0.3, "sad": 0.12, "dark": 0.1, "angry": 0.08}, "lyrics": {"happy": 0.14, "uplifting": 0.2, "energetic": 0.25, "calm": 0.4, "romantic": 0.35, "sad": 0.85, "dark": 0.3, "angry": 0.12}, "diverge": [{"label": "happy", "audio": 0.91, "lyric": 0.14, "delta": 0.77, "verdict": "sounds"}, {"label": "sad", "audio": 0.12, "lyric": 0.85, "delta": 0.73, "verdict": "reads"}, {"label": "uplifting", "audio": 0.82, "lyric": 0.2, "delta": 0.6199999999999999, "verdict": "sounds"}]}, {"id": "demo04", "t": "22:12", "name": "Hollow Static", "artist": "Mara Lune", "audio": {"dark": 0.9, "angry": 0.74, "energetic": 0.58, "sad": 0.44, "happy": 0.1, "uplifting": 0.12, "calm": 0.14, "romantic": 0.16}, "lyrics": {"dark": 0.28, "angry": 0.2, "energetic": 0.3, "sad": 0.4, "happy": 0.3, "uplifting": 0.34, "calm": 0.46, "romantic": 0.78}, "diverge": [{"label": "dark", "audio": 0.9, "lyric": 0.28, "delta": 0.62, "verdict": "sounds"}, {"label": "romantic", "audio": 0.16, "lyric": 0.78, "delta": 0.62, "verdict": "reads"}, {"label": "angry", "audio": 0.74, "lyric": 0.2, "delta": 0.54, "verdict": "sounds"}]}, {"id": "demo01", "t": "22:14", "name": "Paper Lanterns", "artist": "The Dead Air", "audio": {"happy": 0.91, "uplifting": 0.82, "energetic": 0.55, "calm": 0.22, "romantic": 0.3, "sad": 0.12, "dark": 0.1, "angry": 0.08}, "lyrics": {"happy": 0.14, "uplifting": 0.2, "energetic": 0.25, "calm": 0.4, "romantic": 0.35, "sad": 0.85, "dark": 0.3, "angry": 0.12}, "diverge": [{"label": "happy", "audio": 0.91, "lyric": 0.14, "delta": 0.77, "verdict": "sounds"}, {"label": "sad", "audio": 0.12, "lyric": 0.85, "delta": 0.73, "verdict": "reads"}, {"label": "uplifting", "audio": 0.82, "lyric": 0.2, "delta": 0.6199999999999999, "verdict": "sounds"}]}, {"id": "demo08", "t": "22:16", "name": "Concrete Roses", "artist": "Vell Mercer", "audio": {"calm": 0.8, "romantic": 0.58, "sad": 0.4, "happy": 0.34, "uplifting": 0.3, "energetic": 0.18, "dark": 0.22, "angry": 0.14}, "lyrics": {"calm": 0.26, "romantic": 0.3, "sad": 0.44, "happy": 0.2, "uplifting": 0.28, "energetic": 0.4, "dark": 0.5, "angry": 0.84}, "diverge": [{"label": "angry", "audio": 0.14, "lyric": 0.84, "delta": 0.7, "verdict": "reads"}, {"label": "calm", "audio": 0.8, "lyric": 0.26, "delta": 0.54, "verdict": "sounds"}]}]}, "2026-06-14": {"date": "2026-06-14", "label": "Sun, Jun 14", "plays": [{"id": "demo03", "t": "09:46", "name": "Cobalt Engine", "artist": "Hartt & Vale", "audio": {"energetic": 0.93, "happy": 0.66, "uplifting": 0.7, "angry": 0.35, "dark": 0.25, "romantic": 0.18, "calm": 0.08, "sad": 0.1}, "lyrics": {"energetic": 0.8, "happy": 0.58, "uplifting": 0.62, "angry": 0.3, "dark": 0.22, "romantic": 0.2, "calm": 0.12, "sad": 0.14}, "diverge": null}, {"id": "demo08", "t": "12:01", "name": "Concrete Roses", "artist": "Vell Mercer", "audio": {"calm": 0.8, "romantic": 0.58, "sad": 0.4, "happy": 0.34, "uplifting": 0.3, "energetic": 0.18, "dark": 0.22, "angry": 0.14}, "lyrics": {"calm": 0.26, "romantic": 0.3, "sad": 0.44, "happy": 0.2, "uplifting": 0.28, "energetic": 0.4, "dark": 0.5, "angry": 0.84}, "diverge": [{"label": "angry", "audio": 0.14, "lyric": 0.84, "delta": 0.7, "verdict": "reads"}, {"label": "calm", "audio": 0.8, "lyric": 0.26, "delta": 0.54, "verdict": "sounds"}]}, {"id": "demo08", "t": "22:09", "name": "Concrete Roses", "artist": "Vell Mercer", "audio": {"calm": 0.8, "romantic": 0.58, "sad": 0.4, "happy": 0.34, "uplifting": 0.3, "energetic": 0.18, "dark": 0.22, "angry": 0.14}, "lyrics": {"calm": 0.26, "romantic": 0.3, "sad": 0.44, "happy": 0.2, "uplifting": 0.28, "energetic": 0.4, "dark": 0.5, "angry": 0.84}, "diverge": [{"label": "angry", "audio": 0.14, "lyric": 0.84, "delta": 0.7, "verdict": "reads"}, {"label": "calm", "audio": 0.8, "lyric": 0.26, "delta": 0.54, "verdict": "sounds"}]}, {"id": "demo03", "t": "22:59", "name": "Cobalt Engine", "artist": "Hartt & Vale", "audio": {"energetic": 0.93, "happy": 0.66, "uplifting": 0.7, "angry": 0.35, "dark": 0.25, "romantic": 0.18, "calm": 0.08, "sad": 0.1}, "lyrics": {"energetic": 0.8, "happy": 0.58, "uplifting": 0.62, "angry": 0.3, "dark": 0.22, "romantic": 0.2, "calm": 0.12, "sad": 0.14}, "diverge": null}]}};
+let HEATMAP = [{"date": "2026-05-17", "dominant": "happy", "volume": 2}, {"date": "2026-05-18", "dominant": "happy", "volume": 2}, {"date": "2026-05-20", "dominant": "happy", "volume": 2}, {"date": "2026-05-21", "dominant": "energetic", "volume": 1}, {"date": "2026-05-22", "dominant": "energetic", "volume": 3}, {"date": "2026-05-23", "dominant": "happy", "volume": 3}, {"date": "2026-05-24", "dominant": "calm", "volume": 2}, {"date": "2026-05-25", "dominant": "energetic", "volume": 1}, {"date": "2026-05-26", "dominant": "calm", "volume": 2}, {"date": "2026-05-27", "dominant": "calm", "volume": 2}, {"date": "2026-05-28", "dominant": "energetic", "volume": 4}, {"date": "2026-05-29", "dominant": "uplifting", "volume": 3}, {"date": "2026-05-31", "dominant": "happy", "volume": 3}, {"date": "2026-06-01", "dominant": "dark", "volume": 2}, {"date": "2026-06-02", "dominant": "energetic", "volume": 2}, {"date": "2026-06-03", "dominant": "happy", "volume": 4}, {"date": "2026-06-04", "dominant": "happy", "volume": 2}, {"date": "2026-06-05", "dominant": "happy", "volume": 3}, {"date": "2026-06-06", "dominant": "calm", "volume": 3}, {"date": "2026-06-07", "dominant": "happy", "volume": 3}, {"date": "2026-06-08", "dominant": "energetic", "volume": 2}, {"date": "2026-06-09", "dominant": "sad", "volume": 2}, {"date": "2026-06-10", "dominant": "sad", "volume": 5}, {"date": "2026-06-11", "dominant": "dark", "volume": 2}, {"date": "2026-06-12", "dominant": "calm", "volume": 3}, {"date": "2026-06-13", "dominant": "happy", "volume": 6}, {"date": "2026-06-14", "dominant": "energetic", "volume": 4}];
+let WINDOW  = {"start": "2026-05-16", "end": "2026-06-14", "days": 30};
+let SCALE   = {"audio": 2.6925, "lyrics": 2.4839999999999995};     // {audio,lyrics} per-track intensity = full bar
+let TOP_N   = 4;      // axes shown per bar (matches segBar's topN)
+
+let DAY_KEYS = Object.keys(DAYS).sort();
+let curIdx = DAY_KEYS.length - 1;
+
+let hmap = {}, maxVol = 1;
+function indexHeatmap(){
+  hmap = {}; maxVol = 1;
+  HEATMAP.forEach(c => { hmap[c.date] = c; if (c.volume > maxVol) maxVol = c.volume; });
+}
+indexHeatmap();
+
+const pad   = n => String(n).padStart(2,"0");
+const toMin = t => { const [a,b] = t.split(":").map(Number); return a*60+b; };
+const dom   = ch => Object.entries(ch).sort((a,b)=>b[1]-a[1])[0];
+const topN  = (ch,n=TOP_N) => Object.entries(ch).sort((a,b)=>b[1]-a[1]).slice(0,n);
+
+// A channel's mood *intensity* for one track = sum of its shown top-N scores.
+// This is what the bar's filled length encodes (against the corpus SCALE).
+const chanIntensity = ch => topN(ch).reduce((s,[,v])=>s+v,0);
+
+// Mood bar: filled length = intensity/SCALE (clamped to full width), so a faint
+// song is a short stub and a saturated one nearly fills the track; segment widths
+// within the fill keep the mood mix. Length -- never opacity -- carries magnitude.
+function segBar(ch, chan){
+  const items = topN(ch);
+  const intensity = items.reduce((s,[,v])=>s+v,0);
+  if (intensity <= 0) return "";
+  const fill = Math.min(1, intensity / (SCALE[chan] || intensity));
+  return items.map(([m,v])=>{
+    const w = (v / intensity) * fill * 100;   // share of mix x fill length
+    return `<i style="width:${w.toFixed(1)}%;background:${COLOR[m]||'#666'}"></i>`;
+  }).join("");
+}
+function dayAgg(plays,chan){
+  const acc = {}; MOODS.forEach(m=>acc[m]=0);
+  plays.forEach(p=>{ for(const [m,v] of Object.entries(p[chan]||{})) acc[m]+=v; });
+  return acc;
+}
+// Day summary uses the SAME length encoding as the blocks so the two are
+// comparable on one screen: fill = the day's *mean per-track* intensity / SCALE;
+// segment proportions = the day's aggregate mood mix (full spectrum).
+function spec(plays, chan){
+  const agg = dayAgg(plays, chan);
+  const aggSum = Object.values(agg).reduce((s,v)=>s+v,0);
+  if (aggSum <= 0) return `<div class="none">no ${chan} mood this day</div>`;
+  const per = plays.map(p=>chanIntensity(p[chan]||{})).filter(x=>x>0);
+  const mean = per.length ? per.reduce((s,v)=>s+v,0)/per.length : 0;
+  const fill = Math.min(1, mean / (SCALE[chan] || mean || 1));
+  return MOODS.map(m=>agg[m]>0
+    ? `<i style="width:${(agg[m]/aggSum*fill*100).toFixed(1)}%;background:${COLOR[m]}"></i>`
+    : "").join("");
+}
+
+// --- rail: legend + dynamic calendar over the window --------------------- //
+function buildLegend(){
+  const el = document.getElementById("legend");
+  MOODS.forEach(m=>{
+    const r = document.createElement("div"); r.className = "row";
+    r.innerHTML = `<span class="sw" style="background:${COLOR[m]}"></span>${m}`;
+    el.appendChild(r);
+  });
+}
+function buildMonths(){
+  const host = document.getElementById("monthHost");
+  const [sy,sm] = WINDOW.start.split("-").map(Number);
+  const [ey,em] = WINDOW.end.split("-").map(Number);
+  let y = sy, m = sm;
+  while (y < ey || (y === ey && m <= em)){
+    host.appendChild(monthBlock(y,m));
+    m++; if (m > 12){ m = 1; y++; }
+  }
+}
+function monthBlock(y,m){
+  const wrap = document.createElement("div"); wrap.className = "month";
+  const name = new Date(y, m-1, 1).toLocaleString("en-US", {month:"long"});
+  wrap.innerHTML = `<div class="mlabel">${y} &middot; ${name}</div>`;
+  const dow = document.createElement("div"); dow.className = "grid";
+  ["S","M","T","W","T","F","S"].forEach(d=>{
+    const c = document.createElement("div"); c.className = "dow"; c.textContent = d; dow.appendChild(c);
+  });
+  wrap.appendChild(dow);
+  const grid = document.createElement("div"); grid.className = "grid"; grid.style.marginTop = "5px";
+  const first = new Date(y, m-1, 1).getDay();          // 0 = Sunday
+  const ndays = new Date(y, m, 0).getDate();
+  for (let i=0;i<first;i++) grid.appendChild(document.createElement("div"));
+  for (let d=1; d<=ndays; d++){
+    const key = `${y}-${pad(m)}-${pad(d)}`;
+    const cell = document.createElement("div"); cell.className = "cell"; cell.dataset.key = key;
+    if (key < WINDOW.start || key > WINDOW.end) cell.style.opacity = "0.25";  // out of window
+    const h = hmap[key];
+    if (h){
+      cell.classList.add("has");
+      const v = document.createElement("div"); v.className = "vol";
+      v.style.background = h.dominant ? (COLOR[h.dominant]||"#6c6680") : "#6c6680";
+      v.style.opacity = (0.25 + 0.6*(h.volume/maxVol)).toFixed(2);
+      cell.appendChild(v);
+      cell.title = `${key} - ${h.volume} plays` + (h.dominant ? ` - ${h.dominant}` : " - no audio mood");
+      cell.addEventListener("click", ()=>{ const i = DAY_KEYS.indexOf(key); if (i>=0){ curIdx = i; render(); } });
+    }
+    grid.appendChild(cell);
+  }
+  wrap.appendChild(grid);
+  return wrap;
+}
+
+// --- cursor-following chart tooltip -------------------------------------- //
+// Hovering a play (a timeline block or an expanded burst card) shows that song's
+// full diverging chart, floating beside the cursor and tracking it. This is the
+// glance now -- not a text list. moodChart() is the same chart used everywhere.
+const tip = document.getElementById("tip");
+const TIP_W = 340;
+function showChartTip(e,p){
+  tip.innerHTML = `<div class="ctitle">${p.name} <span>${p.artist} &middot; ${p.t}</span></div>`
+    + moodChart(p);
+  tip.style.opacity = "1";
+  const h = tip.offsetHeight, pad2 = 16;
+  let x = e.clientX + pad2, y = e.clientY + pad2;
+  if (x + TIP_W > innerWidth)  x = e.clientX - TIP_W - pad2;
+  if (y + h > innerHeight)     y = Math.max(8, innerHeight - h - 8);
+  tip.style.left = Math.max(8, x) + "px"; tip.style.top = y + "px";
+}
+function hideChartTip(){ tip.style.opacity = "0"; }
+// Hover (mouse) tracks the cursor; click/tap also shows it (touch has no hover)
+// and stops the bubble so the document handler below doesn't immediately hide it.
+function bindChart(el, p){
+  el.addEventListener("mousemove",  e=>showChartTip(e,p));
+  el.addEventListener("mouseleave", hideChartTip);
+  el.addEventListener("click", e=>{ e.stopPropagation(); showChartTip(e,p); });
+}
+document.addEventListener("click", hideChartTip);   // tap outside dismisses (touch)
+
+// --- divergence helpers -------------------------------------------------- //
+// A track is "diverging" if it carries selected divergence axes -- exactly the
+// set `cli divergence` prints (sourced server-side from select_divergences).
+function isDiverging(p){ return !!(p.diverge && p.diverge.length); }
+
+// "sounds X · reads Y" from a track's selected axes. "sounds X" = audio reads
+// higher than the words on label X; "reads Y" = the words read higher on Y.
+// Strongest axis of each verdict; mirrors report_divergence's per-axis verdict.
+function divText(diverge){
+  if (!diverge || !diverge.length) return "";
+  const pick = v => diverge.filter(d=>d.verdict===v).sort((a,b)=>b.delta-a.delta)[0];
+  const s = pick("sounds"), r = pick("reads");
+  const parts = [];
+  if (s) parts.push(`sounds ${s.label}`);
+  if (r) parts.push(`reads ${r.label}`);
+  return parts.join(" · ");
+}
+
+// --- diverging mood chart (per-song; see diverging_mood_chart_mock.html) -- //
+// Fixed valence order, warm->cool. Distinct from MOODS (which keeps `angry`
+// 4th for the timeline palette); the chart wants angry grouped with the cool end.
+const ORDER = ["happy","uplifting","energetic","romantic","calm","angry","sad","dark"];
+
+// One row per mood: audio grows LEFT from the center line, lyrics grows RIGHT,
+// length = that mood's RAW score (0..1; full half = 1.0) -- absolute per-mood,
+// not the corpus-scaled timeline intensity. Empty lyrics => empty right half.
+// Chart only (no song header) -- the summary row above it already identifies the song.
+function moodChart(p){
+  const audio = p.audio || {}, lyrics = p.lyrics || {};
+  const hasLyr = Object.keys(lyrics).length > 0;
+  const rows = ORDER.map(m=>{
+    const a = audio[m] || 0, aPct = (a*100).toFixed(0);
+    const glL = `<div class="gl" style="right:50%"></div><div class="gl" style="right:0"></div>`;
+    const left = `<div class="side">${glL}<div class="fillL" style="width:${aPct}%;background:${COLOR[m]}"></div>${a>0.18?`<div class="valL">${aPct}</div>`:""}</div>`;
+    let right;
+    if (!hasLyr){
+      right = `<div class="side"><div class="emptyR">no lyrics</div></div>`;
+    } else {
+      const l = lyrics[m] || 0, lPct = (l*100).toFixed(0);
+      const glR = `<div class="gl" style="left:50%"></div><div class="gl" style="left:calc(100% - 1px)"></div>`;
+      right = `<div class="side">${glR}<div class="fillR" style="width:${lPct}%;background:${COLOR[m]}"></div>${l>0.18?`<div class="valR">${lPct}</div>`:""}</div>`;
+    }
+    return `<div class="row">${left}<div class="lab">${m}</div>${right}</div>`;
+  }).join("");
+  const dt = divText(p.diverge);
+  const tag = dt ? `<div class="dtag"><span class="d"></span>${dt}</div>` : "";
+  return `<div class="mchart">
+    <div class="axhead"><div class="a">Audio <span>how it sounded</span> &larr;</div><div class="c">0</div><div class="l">&rarr; <span>what the words said</span> Lyrics</div></div>
+    <div class="center-wrap"><div class="center-rule"></div>${rows}</div>
+    ${tag}</div>`;
+}
+
+// Inner markup of a timeline-style block (name/time/artist + segmented mood bar +
+// dominant label, or "no ..."). Shared by the timeline blocks and the expanded
+// burst's per-song cards so the two look identical.
+function cardInner(p, chan){
+  const ch = p[chan] || {};
+  if (Object.keys(ch).length === 0)
+    return `<div class="bt"><div class="name">${p.name}</div><div class="time">${p.t}</div></div>
+      <div class="artist">${p.artist}</div><div class="none">no ${chan==='audio'?'audio score':'lyrics'}</div>`;
+  const d = dom(ch);
+  return `<div class="bt"><div class="name">${p.name}</div><div class="time">${p.t}</div></div>
+    <div class="artist">${p.artist}</div>
+    <div class="bar">${segBar(ch, chan)}</div>
+    <div class="dom"><span class="dot" style="background:${COLOR[d[0]]||'#666'}"></span><span class="dlbl">${d[0]} ${(d[1]*100|0)}%</span></div>`;
+}
+// Per-song row in an expanded burst: two static cards (audio | lyrics) side by
+// side, same look as the timeline blocks; hover the row for its diverging chart.
+function paneRow(p){
+  const row = document.createElement("div"); row.className = "prow";
+  const dt = divText(p.diverge);
+  row.innerHTML = `
+    <div class="pcards">
+      <div class="block">${cardInner(p,'audio')}</div>
+      <div class="block">${cardInner(p,'lyrics')}</div>
+    </div>
+    ${dt?`<div class="ptag"><span class="t"><span class="d"></span>${dt}</span></div>`:""}`;
+  bindChart(row, p);
+  return row;
+}
+
+// Collapse hook for the *current* day's timeline, reset on each render so Esc and
+// day navigation always target the live expansion.
+let collapseExpansion = ()=>{};
+document.addEventListener("keydown", e=>{ if (e.key === "Escape") collapseExpansion(); });
+
+// Make a timeline element clickable AND keyboard-activatable (Enter/Space).
+function activatable(el, fn){
+  el.tabIndex = 0; el.setAttribute("role", "button");
+  el.addEventListener("click", fn);
+  el.addEventListener("keydown", e=>{ if (e.key === "Enter" || e.key === " "){ e.preventDefault(); fn(); } });
+}
+
+// --- timeline blocks ----------------------------------------------------- //
+function mkBlock(p,chan){
+  const b = document.createElement("div"); b.className = "block";
+  b.innerHTML = cardInner(p, chan);
+  bindChart(b, p);   // hover/tap -> cursor-following diverging chart for the song
+  return b;
+}
+function mkDivTag(diverge){
+  const el = document.createElement("div"); el.className = "divtag";
+  el.innerHTML = `<div class="tag">${divText(diverge)}</div>`;
+  return el;
+}
+
+// --- dense-day clustering (presentation-only) ---------------------------- //
+// Trigger derived from the densest real day (Jun 14: within-burst gaps <=6 min,
+// between-burst gaps >=13 min). Named constants, not magic numbers.
+const CLUSTER_GAP_MIN = 8;   // consecutive plays within this many minutes = one run
+const CLUSTER_MIN_RUN = 3;   // a run of >= this many plays collapses into a cluster
+function buildGroups(plays){
+  const groups = [];
+  let i = 0;
+  while (i < plays.length){
+    let j = i + 1;
+    while (j < plays.length && (toMin(plays[j].t) - toMin(plays[j-1].t)) <= CLUSTER_GAP_MIN) j++;
+    const run = plays.slice(i, j);
+    if (run.length >= CLUSTER_MIN_RUN)
+      groups.push({type:"cluster", plays:run, t0:run[0].t, t1:run[run.length-1].t});
+    else
+      run.forEach(p=>groups.push({type:"single", play:p, t0:p.t}));
+    i = j;
+  }
+  return groups;
+}
+// Display-only: how many distinct member tracks are in the tagged set. We never
+// recompute/aggregate divergence at the cluster level or merge member scores.
+function clusterDivCount(plays){
+  const ids = new Set();
+  plays.forEach(p=>{ if (isDiverging(p)) ids.add(p.id); });
+  return ids.size;
+}
+// Collapsed cluster = the glance (span / play count / diverging count). The
+// per-song detail is no longer nested here; a click expands it inline below
+// (wired in renderTimeline, which owns the reflow).
+function mkCluster(g){
+  const el = document.createElement("div"); el.className = "cluster";
+  const k = clusterDivCount(g.plays);
+  const marker = k>0 ? ` &middot; <span class="dmark"><span class="ddot"></span>${k} diverging</span>` : "";
+  el.innerHTML = `
+    <div class="chead">
+      <span class="ctime">${g.t0}&ndash;${g.t1}</span>
+      <span class="cmeta">${g.plays.length} plays${marker}</span>
+    </div>
+    <div class="chint">tap to expand</div>`;
+  return el;
+}
+
+function renderTimeline(day){
+  const root = document.getElementById("root");
+  root.innerHTML = `
+    <div class="timeline">
+      <div class="lane-heads">
+        <div class="lane-head"><b>Audio</b> <span class="sub">how it sounded</span></div>
+        <div class="lane-head"><b>Lyrics</b> <span class="sub">what the words said</span></div>
+      </div>
+      <div class="track-area" id="trackArea"></div>
+    </div>`;
+  const area = document.getElementById("trackArea");
+
+  const mins = day.plays.map(p=>toMin(p.t));
+  let startMin = Math.max(0, Math.floor(Math.min(...mins)/60)*60 - 60);
+  let endMin   = Math.min(24*60, Math.ceil(Math.max(...mins)/60)*60 + 60);
+  if (endMin - startMin < 120){ startMin = Math.max(0,startMin-60); endMin = Math.min(24*60,endMin+60); }
+  const span = endMin - startMin;
+  const H = Math.max(420, span/60 * 64);
+  const topPx = t => ((toMin(t)-startMin)/span) * H;
+
+  // Registry of every time-positioned element + its laid-out top. Expansion reflow
+  // works by re-deriving each element's top from this base (base, or base + panel
+  // height when it sits below an open panel) -- never by absolute-overlaying.
+  // baseTop = laid-out top; shiftAt = the y a panel's cutoff is compared against to
+  // decide if this element is "below" (a divergence tag floats 12px above its block
+  // but must shift with it, so its shiftAt is the block top, not the tag's own top).
+  const placed = [];   // {el, baseTop, shiftAt}
+  const reg = (el, baseTop, shiftAt) => {
+    placed.push({el, baseTop, shiftAt: shiftAt === undefined ? baseTop : shiftAt});
+    return el;
+  };
+
+  const hours = document.createElement("div"); hours.className = "hours";
+  area.appendChild(hours);
+
+  // Three layers: single-play audio lane, single-play lyrics lane, and an overlay
+  // (clusters span both lanes; standalone divergence tags + expansion panels live here).
+  const laneA = document.createElement("div"); laneA.className = "lane";
+  const laneL = document.createElement("div"); laneL.className = "lane";
+  const overlay = document.createElement("div"); overlay.className = "overlay";
+  area.appendChild(laneA); area.appendChild(laneL); area.appendChild(overlay);
+
+  // One vertical cursor across all groups so singles and clusters never overlap.
+  // Heights are measured from the live DOM (variable block heights, collapsed
+  // clusters), so a dense day's content never clips. We also record each group's
+  // (start-time -> laid-out top) as an anchor for the hour axis below.
+  const GAP = 8;
+  let prevBottom = -Infinity;
+  const anchors = [];   // {min, y} per group, in time order -- drives the hour axis
+  buildGroups(day.plays).forEach(g=>{
+    let top = topPx(g.t0);
+    if (top < prevBottom + GAP) top = prevBottom + GAP;
+    anchors.push({min: toMin(g.t0), y: top});
+    if (g.type === "single"){
+      // A single play is its own two-lane representation already; hover shows its
+      // chart (mkBlock -> bindChart). No expansion -- only bursts expand on click.
+      const a = mkBlock(g.play,"audio"); const l = mkBlock(g.play,"lyrics");
+      laneA.appendChild(a); laneL.appendChild(l);
+      a.style.top = top+"px"; l.style.top = top+"px"; reg(a, top); reg(l, top);
+      if (isDiverging(g.play)){
+        const tag = mkDivTag(g.play.diverge); overlay.appendChild(tag);
+        const tt = Math.max(0, top-12); tag.style.top = tt+"px"; reg(tag, tt, top);
+      }
+      prevBottom = top + Math.max(a.offsetHeight, l.offsetHeight);
+    } else {
+      const c = mkCluster(g); overlay.appendChild(c);
+      c.style.top = top+"px"; reg(c, top);
+      const bottom = top + c.offsetHeight;
+      const rec = {plays:g.plays, single:false, t0:g.t0, t1:g.t1, bottom, anchors:[c]};
+      activatable(c, ()=>toggle(rec));
+      prevBottom = bottom;
+    }
+  });
+
+  const contentH = Math.max(H, prevBottom) + 14;
+
+  // Hour axis aligned to the *laid-out* blocks, not ideal proportional time: when
+  // closely-spaced plays get bumped down (block taller than the time gap), a strict
+  // clock would drift a block far past its hour line. Instead, interpolate each
+  // hour's y across the (time -> top) anchors, so an hour label always sits between
+  // the plays it falls between. Padding hours (outside the anchors) fall back to the
+  // nominal px/min rate.
+  const pxPerMin = H / span;
+  const yForMin = min => {
+    if (!anchors.length) return ((min - startMin) / span) * H;
+    if (min <= anchors[0].min) return anchors[0].y - (anchors[0].min - min) * pxPerMin;
+    for (let i = 0; i < anchors.length - 1; i++){
+      const a = anchors[i], b = anchors[i+1];
+      if (min <= b.min) return a.y + (min - a.min) / Math.max(1, b.min - a.min) * (b.y - a.y);
+    }
+    const last = anchors[anchors.length - 1];
+    return last.y + (min - last.min) * pxPerMin;
+  };
+  for (let h = Math.ceil(startMin/60); h <= Math.floor(endMin/60); h++){
+    const y = yForMin(h*60);
+    if (y < -2 || y > contentH) continue;
+    const lab = document.createElement("div"); lab.className = "hour"; lab.style.top = y+"px";
+    lab.textContent = pad(h)+":00"; hours.appendChild(lab); reg(lab, y);
+    const gl = document.createElement("div"); gl.className = "gridline"; gl.style.top = y+"px";
+    area.insertBefore(gl, laneA); reg(gl, y);   // before the lanes => painted behind blocks
+  }
+
+  const setHeights = h => { hours.style.height = laneA.style.height = laneL.style.height = h+"px"; };
+  setHeights(contentH);
+
+  // --- inline accordion expansion (real reflow, never overlay) ------------ //
+  // Clicking a burst inserts a full-content-width panel just below its bottom: one
+  // two-lane card row per song (audio | lyrics, same look as the timeline). Every
+  // timeline element below the cutoff is translated down by the panel's height so
+  // the hour labels/gridlines stay aligned with the content; collapse reverses it.
+  // The per-song diverging chart is the cursor tooltip (bindChart), not inline.
+  let openRec = null, openPanel = null;
+  function collapse(){
+    if (!openRec) return;
+    if (openPanel){ openPanel.remove(); openPanel = null; }
+    placed.forEach(o => o.el.style.top = o.baseTop+"px");     // restore exact prior layout
+    openRec.anchors.forEach(a => a.classList.remove("inspecting"));
+    openRec = null;
+    setHeights(contentH);
+  }
+  function expand(rec){
+    const panel = document.createElement("div"); panel.className = "expanse";
+    rec.plays.forEach(p => panel.appendChild(paneRow(p)));
+    panel.style.top = (rec.bottom + GAP)+"px";
+    overlay.appendChild(panel);
+    const shift = panel.offsetHeight + GAP*2;                 // inserted vertical space
+    placed.forEach(o => { if (o.shiftAt >= rec.bottom) o.el.style.top = (o.baseTop + shift)+"px"; });
+    rec.anchors.forEach(a => a.classList.add("inspecting"));
+    openRec = rec; openPanel = panel;
+    setHeights(contentH + shift);
+  }
+  function toggle(rec){ const wasOpen = (openRec === rec); collapse(); if (!wasOpen) expand(rec); }
+  collapseExpansion = collapse;   // Esc + day-nav target this day's expansion
+}
+
+function render(){
+  collapseExpansion();   // the timeline is rebuilt below; drop any open expansion
+  const lbl = document.getElementById("dateLabel");
+  document.querySelectorAll(".cell").forEach(c=>c.classList.remove("sel"));
+
+  if (DAY_KEYS.length === 0){
+    lbl.childNodes[0].nodeValue = "No data ";
+    document.getElementById("dateSub").textContent = "";
+    document.getElementById("sumMeta").textContent = "";
+    document.getElementById("sumAudio").innerHTML = "";
+    document.getElementById("sumLyrics").innerHTML = "";
+    document.getElementById("root").innerHTML =
+      `<div class="empty">No plays logged this day. Run <code>poll</code> then regenerate.</div>`;
+    document.getElementById("prev").disabled = true;
+    document.getElementById("next").disabled = true;
+    return;
+  }
+
+  const key = DAY_KEYS[curIdx];
+  const day = DAYS[key];
+  lbl.childNodes[0].nodeValue = day.label + " ";
+  document.getElementById("dateSub").textContent = day.plays.length + " plays";
+  document.getElementById("sumMeta").textContent = key;
+  document.querySelectorAll(".cell").forEach(c=>c.classList.toggle("sel", c.dataset.key===key));
+
+  document.getElementById("sumAudio").innerHTML  = spec(day.plays, "audio");
+  document.getElementById("sumLyrics").innerHTML = spec(day.plays, "lyrics");
+
+  renderTimeline(day);
+  document.getElementById("prev").disabled = curIdx <= 0;
+  document.getElementById("next").disabled = curIdx >= DAY_KEYS.length-1;
+}
+
+document.getElementById("prev").onclick = ()=>{ if (curIdx>0){ curIdx--; render(); } };
+document.getElementById("next").onclick = ()=>{ if (curIdx<DAY_KEYS.length-1){ curIdx++; render(); } };
+
+// --- (re)apply a payload + render ---------------------------------------- //
+// First paint uses the embedded JSON (no arg). After a Sync, applyData(payload)
+// reassigns the mutable data, recomputes derived state, rebuilds the calendar
+// rail, and re-renders -- a real in-place refresh, no page reload.
+function rebuildRail(){
+  document.getElementById("monthHost").innerHTML = "";
+  buildMonths();
+}
+function applyData(payload){
+  if (payload){
+    DAYS = payload.days; HEATMAP = payload.heatmap; WINDOW = payload.window;
+    SCALE = payload.scale; TOP_N = payload.top_n;
+  }
+  DAY_KEYS = Object.keys(DAYS).sort();
+  indexHeatmap();
+  // Land on the newest day (a sync's new plays are "today"); clamp if fewer days.
+  curIdx = Math.max(0, DAY_KEYS.length - 1);
+  rebuildRail();
+  render();
+}
+
+// --- in-page sync (server mode only) ------------------------------------- //
+const syncBtn = document.getElementById("syncBtn");
+const syncStat = document.getElementById("syncStat");
+function fmtCounts(c){ return (c && c.total) ? ` ${c.done}/${c.total}` : ""; }
+function setSyncing(on, text){
+  if (syncBtn) syncBtn.disabled = on;
+  if (syncBtn) syncBtn.innerHTML = on ? `<span class="spin"></span> Syncing` : "Sync now";
+  if (syncStat && text != null) syncStat.textContent = text;
+}
+async function pollStatus(){
+  let s;
+  try { s = await (await fetch("/api/sync/status")).json(); }
+  catch(err){ setSyncing(false, "status unreachable"); return; }
+  if (s.running){
+    setSyncing(true, s.stage + fmtCounts(s));
+    setTimeout(pollStatus, 1500);
+    return;
+  }
+  if (s.error){
+    const re = /auth|token|consent/i.test(s.error);
+    setSyncing(false, re ? "auth expired - run: cli auth" : ("error: " + s.error));
+    return;
+  }
+  // Done: pull fresh data and re-render in place, preserving the page.
+  try {
+    const payload = await (await fetch(`/api/payload?days=${WINDOW.days}`)).json();
+    applyData(payload);
+  } catch(err){ /* keep current view if the refetch fails */ }
+  setSyncing(false, s.last_synced_at ? ("synced " + s.last_synced_at.slice(11,16)) : "synced");
+}
+async function doSync(){
+  setSyncing(true, "starting...");
+  const body = JSON.stringify({
+    audio:  document.getElementById("chAudio").checked,
+    lyrics: document.getElementById("chLyrics").checked,
+  });
+  let r;
+  try { r = await fetch("/api/sync", {method:"POST",
+        headers:{"Content-Type":"application/json"}, body}); }
+  catch(err){ setSyncing(false, "sync unreachable"); return; }
+  if (r.status === 409){ setSyncing(true, "already running..."); }
+  else if (!r.ok){ setSyncing(false, "sync failed to start"); return; }
+  pollStatus();
+}
+function wireSync(){
+  if (!SERVER_MODE) return;                 // static file: control stays hidden
+  document.getElementById("syncbox").hidden = false;
+  syncBtn.onclick = doSync;
+  pollStatus();                             // resume if a sync is already running
+}
+
+buildLegend(); applyData(); wireSync();
+</script>
+</body>
+</html>
